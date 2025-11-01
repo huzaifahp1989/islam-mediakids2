@@ -1,0 +1,22 @@
+[build]
+  publish =
+
+
+# Force HTTPS and root domain
+[[redirects]]
+  from = "http://imediackids.com/*"
+  to = "https://imediackids.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.imediackids.com/*"
+  to = "https://imediackids.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.imediackids.com/*"
+  to = "https://imediackids.com/:splat"
+  status = 301
+  force = true

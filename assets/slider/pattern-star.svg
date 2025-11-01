@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="rgb(8,47,73)"/>
+      <stop offset="100%" stop-color="rgb(17,94,89)"/>
+    </linearGradient>
+    <pattern id="tile" width="120" height="120" patternUnits="userSpaceOnUse">
+      <rect width="120" height="120" fill="rgb(0,0,0)" opacity="0"/>
+      <g transform="translate(60,60)">
+        <rect x="-40" y="-40" width="80" height="80" fill="rgb(245,209,114)" opacity="0.9"/>
+        <rect x="-40" y="-40" width="80" height="80" fill="rgb(229,231,235)" transform="rotate(45)" opacity="0.9"/>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#tile)" opacity="0.25"/>
+</svg>

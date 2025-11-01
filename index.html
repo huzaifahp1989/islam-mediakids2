@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IMediaC Kids – Learn, Play & Grow</title>
+    <meta name="description" content="IMediaC Kids: Islamic values, Quran, hadith, duas, stories, games and quizzes for children." />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Use local SVG favicon to avoid 404s -->
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title">
+          <div class="logo-circle">🌟</div>
+          <h1 class="site-title">IMediaC Kids</h1>
+        </div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link active">🏠 Home</a>
+          <a href="games.html" class="nav-link">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="quran.html" class="nav-link">📗 Quran</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Join Now</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <h2>Welcome to IMediaC Kids – Learn, Play & Grow!</h2>
+        <p>Fun, colourful and educational Islamic activities for kids.</p>
+        <div class="hero-actions">
+          <a href="auth.html" class="btn btn-primary">Join Now</a>
+          <a href="games.html" class="btn btn-secondary">Start Playing</a>
+        </div>
+      </section>
+
+      <!-- Islamic Quotes & Images Slider -->
+      <section id="homeSlider" class="card" aria-label="Islamic Quotes Slider">
+        <div class="slider" role="region" aria-roledescription="carousel" aria-label="Islamic Quotes">
+          <div class="slides" id="sliderSlides">
+            <!-- Populated by scripts/main.js -->
+          </div>
+          <button class="slider-nav prev" id="sliderPrev" aria-label="Previous">‹</button>
+          <button class="slider-nav next" id="sliderNext" aria-label="Next">›</button>
+          <div class="slider-dots" id="sliderDots" aria-label="Slide indicators"></div>
+        </div>
+      </section>
+
+      <section id="radio" class="card" aria-label="Islamic Radio">
+        <audio id="radioPlayer" preload="none" src="https://a4.asurahosting.com:7820/radio.mp3" style="display:none">
+          Your browser does not support the audio element.
+          <a href="https://a4.asurahosting.com:7820/radio.mp3" target="_blank" rel="noopener">Open stream</a>.
+        </audio>
+        <div class="radio-player" role="group" aria-label="Radio player">
+          <div class="rp-header">
+            <div class="rp-icon" aria-hidden="true">📻</div>
+            <div class="rp-text">
+              <h2>Live Islamic Radio</h2>
+              <p id="radioStatus" aria-live="polite">Stopped</p>
+            </div>
+          </div>
+          <div class="rp-controls">
+            <button id="radioToggleBtn" class="btn btn-primary" aria-label="Play">▶ Play</button>
+            <button id="radioStopBtn" class="btn btn-outline" aria-label="Stop">■ Stop</button>
+            <button id="radioMuteBtn" class="btn btn-outline" aria-label="Mute">🔇 Mute</button>
+            <label class="rp-volume">
+              Volume
+              <input id="radioVolume" type="range" min="0" max="1" step="0.01" value="1" />
+            </label>
+          </div>
+          <div class="rp-visualizer" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="profileBox" class="card" aria-live="polite" style="margin-top:16px;">
+        <!-- Filled by scripts/main.js: shows logged-in child's username, madrasah, age, and points -->
+        <h2>Your Profile</h2>
+        <p>Loading...</p>
+      </section>
+
+      <section class="icon-grid">
+        <a class="icon-card" href="games.html" aria-label="Games">
+          <div class="icon">🎮</div>
+          <h3>Games</h3>
+          <p>Play fun HTML5 games and learn!</p>
+        </a>
+        <a class="icon-card" href="games.html#quiz" aria-label="Quizzes">
+          <div class="icon">🧠</div>
+          <h3>Quizzes</h3>
+          <p>Answer daily and weekly Islamic quizzes.</p>
+        </a>
+        <a class="icon-card" href="stories.html" aria-label="Stories">
+          <div class="icon">📖</div>
+          <h3>Stories</h3>
+          <p>Moral stories with fun characters.</p>
+        </a>
+        <a class="icon-card" href="prizes.html" aria-label="Prizes">
+          <div class="icon">🎁</div>
+          <h3>Prizes</h3>
+          <p>Win monthly badges, books and more!</p>
+        </a>
+        <a class="icon-card" href="quran.html" aria-label="Quran">
+          <div class="icon">📗</div>
+          <h3>Quran</h3>
+          <p>Read and listen verse-by-verse with translations.</p>
+        </a>
+        <a class="icon-card" href="learn.html" aria-label="Learn">
+          <div class="icon">🌙</div>
+          <h3>Learn</h3>
+          <p>Ayah, Hadith and Dua of the day.</p>
+        </a>
+      </section>
+
+      <section class="cta">
+        <p>Kids earn points for every quiz or game. Top 3 win monthly prizes!</p>
+        <a href="leaderboard.html" class="btn btn-outline">View Leaderboard</a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p>
+      </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+  </body>
+</html>
+

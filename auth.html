@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login / Signup – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🔐</div><h1 class="site-title">Login / Signup</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link active btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>Welcome!</h2>
+        <p id="authStatus"></p>
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+          <form id="signupForm" class="card">
+            <h3>Signup</h3>
+            <label for="su-username">Username</label>
+            <input id="su-username" name="username" required />
+            <label for="su-email">Parent's Email</label>
+            <input id="su-email" name="email" type="email" required />
+            <label for="su-password">Password</label>
+            <input id="su-password" name="password" type="password" required />
+            <label for="su-madrasah">Madrasah Name</label>
+            <input id="su-madrasah" name="madrasah" placeholder="e.g., Al-Noor Madrasah" required />
+            <label for="su-age">Age</label>
+            <input id="su-age" name="age" type="number" min="3" max="18" placeholder="e.g., 9" required />
+            <button type="submit" class="btn btn-primary">Create Account</button>
+            <p style="opacity:.8; margin-top:8px;">Signup bonus: +20 points!</p>
+          </form>
+
+          <form id="loginForm" class="card">
+            <h3>Login</h3>
+            <label for="li-username">Username</label>
+            <input id="li-username" name="username" required />
+            <label for="li-password">Password</label>
+            <input id="li-password" name="password" type="password" required />
+            <label for="li-madrasah">Madrasah Name</label>
+            <input id="li-madrasah" name="madrasah" placeholder="e.g., Al-Noor Madrasah" required />
+            <label for="li-age">Age</label>
+            <input id="li-age" name="age" type="number" min="3" max="18" placeholder="e.g., 9" required />
+            <button type="submit" class="btn btn-secondary">Log In</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
+    <script src="scripts/main.js"></script>
+  </body>
+</html>

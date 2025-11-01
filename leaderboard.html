@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Leaderboard – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🏆</div><h1 class="site-title">Leaderboard</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link active">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>Top Players</h2>
+        <p id="leaderboardInfo">Top 3 win monthly prizes!</p>
+        <table class="leaderboard-table">
+          <thead>
+            <tr><th class="col-rank">Rank</th><th class="col-name">Player Name</th><th class="col-madrasah">Madrasah</th><th class="col-age">Age</th><th class="col-points">Points</th></tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
+    <script src="scripts/main.js"></script>
+  </body>
+</html>

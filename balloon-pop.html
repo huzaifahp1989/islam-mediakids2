@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Balloon Pop – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .game-area { position: relative; height: 420px; border-radius: 12px; background: var(--card-bg); overflow: hidden; box-shadow: var(--shadow-inset); }
+      .hud { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
+      .balloon { position:absolute; width:48px; height:58px; border-radius: 24px 24px 28px 28px; background: #ff6b6b; box-shadow: 0 4px 10px rgba(0,0,0,.15); cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; }
+      .balloon::after { content:''; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:2px; height:22px; background:#555; }
+      .balloon.blue { background:#4dabf7; }
+      .balloon.green { background:#51cf66; }
+      .balloon.yellow { background:#fcc419; }
+      @keyframes floatUp { from { transform: translateY(0); } to { transform: translateY(-460px); } }
+    </style>
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🎈</div><h1 class="site-title">Balloon Pop</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <div class="hud">
+          <strong>Score:</strong><span id="bpScore">0</span>
+          <strong>Time:</strong><span id="bpTime">30</span>s
+          <button id="bpStart" class="btn btn-primary">▶ Start</button>
+          <span id="bpStatus" class="q-status"></span>
+        </div>
+        <div id="bpArea" class="game-area" aria-label="Balloon pop game area"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
+    <script src="scripts/main.js"></script>
+    <script>
+      (function(){
+        const area = document.getElementById('bpArea');
+        const startBtn = document.getElementById('bpStart');
+        const scoreEl = document.getElementById('bpScore');
+        const timeEl = document.getElementById('bpTime');
+        const statusEl = document.getElementById('bpStatus');
+        let score = 0, timeLeft = 30, timer = null, spawner = null, running = false;
+
+        function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+        function spawnBalloon(){
+          const b = document.createElement('div');
+          b.className = 'balloon ' + ['blue','green','yellow',''][rand(0,3)];
+          const x = rand(8, area.clientWidth - 56);
+          const duration = rand(4000, 7000);
+          b.style.left = x + 'px';
+          b.style.bottom = '-64px';
+          b.style.animation = `floatUp ${duration}ms linear forwards`;
+          b.textContent = '🎯';
+          b.addEventListener('click', () => { score++; scoreEl.textContent = score; b.remove(); });
+          // Remove when out of view
+          setTimeout(() => b.remove(), duration + 200);
+          area.appendChild(b);
+        }
+
+        function endGame(){ running = false; clearInterval(timer); clearInterval(spawner); statusEl.textContent = 'Game Over';
+          // Award points equal to score
+          try {
+            if (typeof currentUser === 'function' && typeof addPoints === 'function') {
+              const u = currentUser(); if (u) { addPoints(u.id, Math.max(1, score), 'balloon-pop'); }
+            }
+          } catch {}
+          alert(`Great job! Your score: ${score}`);
+        }
+
+        function tick(){ timeLeft--; timeEl.textContent = timeLeft; if (timeLeft <= 0) endGame(); }
+        function start(){ if (running) return; running = true; score = 0; timeLeft = 30; scoreEl.textContent = score; timeEl.textContent = timeLeft; statusEl.textContent='';
+          spawner = setInterval(spawnBalloon, 800); timer = setInterval(tick, 1000); }
+
+        startBtn.addEventListener('click', start);
+      })();
+    </script>
+  </body>
+</html>
+

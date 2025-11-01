@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quran – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">📖</div><h1 class="site-title">Quran</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" id="quranPage">
+      <section class="card">
+        <h2>Read and Listen</h2>
+        <div class="q-controls">
+          <label for="surahSelect">Surah</label>
+          <select id="surahSelect" aria-label="Select Surah"></select>
+          <label for="reciterSelect">Reciter</label>
+          <select id="reciterSelect" aria-label="Select Reciter">
+            <option value="abdul-basit-192" selected>Abdul Basit (192kbps)</option>
+            <option value="alafasy-128">Mishary Alafasy (128kbps)</option>
+            <option value="husary-64">Husary (64kbps)</option>
+            <option value="shaikh-ash-shatree-64">Abu Bakr Ash-Shaatree (64kbps)</option>
+            <option value="minshawi-64">Minshawi (64kbps)</option>
+          </select>
+          <label for="translationSelect">Translation</label>
+          <select id="translationSelect" aria-label="Select Translation">
+            <option value="en.sahih" selected>Sahih Intl (EN)</option>
+            <option value="en.yusufali">Yusuf Ali (EN)</option>
+            <option value="en.pickthall">Pickthall (EN)</option>
+            <option value="en.hilali">Hilali & Khan (EN)</option>
+            <option value="en.daryabadi">Daryabadi (EN)</option>
+            <option value="en.maududi">Maududi (EN)</option>
+            <option value="en.ahmedali">Ahmed Ali (EN)</option>
+          </select>
+          <label for="toggleTranslation" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="toggleTranslation" checked /> Show English</label>
+          <button id="playAllBtn" class="btn btn-primary" disabled>▶ Play All</button>
+          <button id="stopAllBtn" class="btn btn-outline" disabled>■ Stop</button>
+          <span id="qStatus" class="q-status">Loading surahs…</span>
+        </div>
+      </section>
+      <section class="card">
+        <ul id="ayahList" class="ayah-list"></ul>
+      </section>
+      <audio id="ayahAudio" preload="none" controls aria-label="Ayah audio player">
+        <source id="ayahSource" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+    </main>
+
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
+    <script src="scripts/main.js"></script>
+  </body>
+</html>

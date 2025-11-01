@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Puzzle Match – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .pm-grid { display:grid; grid-template-columns: repeat(4, 80px); gap:12px; justify-content:center; }
+      .pm-card { width:80px; height:80px; border-radius:12px; background: var(--card-bg); box-shadow: var(--shadow); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:32px; user-select:none; }
+      .pm-card.revealed { background:#e6fcf5; }
+      .pm-card.matched { background:#d3f9d8; cursor:default; }
+      .hud { display:flex; gap:12px; align-items:center; margin-bottom:8px; justify-content:center; }
+    </style>
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🧩</div><h1 class="site-title">Puzzle Match</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <div class="hud">
+          <strong>Moves:</strong><span id="pmMoves">0</span>
+          <strong>Matched:</strong><span id="pmMatched">0</span>/8
+          <button id="pmRestart" class="btn btn-primary">🔄 Restart</button>
+          <span id="pmStatus" class="q-status"></span>
+        </div>
+        <div id="pmGrid" class="pm-grid" aria-label="Puzzle match grid"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
+    <script src="scripts/main.js"></script>
+    <script>
+      (function(){
+        const symbols = ['🌙','⭐','🕌','📖','🧠','🎁','🕋','🧕'];
+        const grid = document.getElementById('pmGrid');
+        const movesEl = document.getElementById('pmMoves');
+        const matchedEl = document.getElementById('pmMatched');
+        const restartBtn = document.getElementById('pmRestart');
+        const statusEl = document.getElementById('pmStatus');
+        let deck = [], first = null, busy = false, moves = 0, matched = 0;
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()* (i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+        function buildDeck(){ deck = shuffle([...symbols, ...symbols]); }
+        function render(){ grid.innerHTML=''; deck.forEach((sym, idx) => {
+          const card = document.createElement('div'); card.className='pm-card'; card.dataset.index = idx; card.dataset.symbol = sym; card.textContent = '❓';
+          card.addEventListener('click', () => onFlip(card)); grid.appendChild(card);
+        }); moves = 0; matched = 0; movesEl.textContent = moves; matchedEl.textContent = matched; statusEl.textContent=''; first = null; busy=false; }
+        function onFlip(card){ if (busy) return; if (card.classList.contains('matched')) return; if (card.classList.contains('revealed')) return; card.classList.add('revealed'); card.textContent = card.dataset.symbol;
+          if (!first){ first = card; return; } moves++; movesEl.textContent = moves; busy = true; setTimeout(() => {
+            if (first.dataset.symbol === card.dataset.symbol){ first.classList.add('matched'); card.classList.add('matched'); matched += 2; matchedEl.textContent = matched;
+              if (matched === deck.length){ statusEl.textContent = 'You matched all pairs!';
+                try { if (typeof currentUser === 'function' && typeof addPoints === 'function'){ const u = currentUser(); if(u){ addPoints(u.id, 10 + Math.max(0, 20 - moves), 'puzzle-match'); } } } catch{}
+                alert(`Great job! All matched in ${moves} moves.`);
+              }
+            } else {
+              first.classList.remove('revealed'); first.textContent = '❓'; card.classList.remove('revealed'); card.textContent = '❓';
+            }
+            first = null; busy = false;
+          }, 600);
+        }
+        function start(){ buildDeck(); render(); }
+        restartBtn.addEventListener('click', start);
+        start();
+      })();
+    </script>
+  </body>
+</html>
+

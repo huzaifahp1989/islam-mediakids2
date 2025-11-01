@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Games & Quizzes – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🎮</div><h1 class="site-title">Games & Quizzes</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link active">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>Fun HTML5 Games</h2>
+        <p>Play simple, kid-friendly games. More coming soon!</p>
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+          <a class="icon-card" href="balloon-pop.html">🎈 Balloon Pop</a>
+          <a class="icon-card" href="puzzle-match.html">🧩 Puzzle Match</a>
+          <a class="icon-card" href="car-race.html">🚗 Car Race</a>
+        </div>
+      </section>
+
+      <section id="quiz" class="card" style="margin-top:16px;">
+        <h2>Daily Islamic Quiz</h2>
+        <p id="quizNotice">Earn points every time you play!</p>
+        <form id="quizForm">
+          <div class="grid" style="grid-template-columns: 1fr;">
+            <div>
+              <label>1) What is the first pillar of Islam?</label>
+              <div>
+                <label><input type="radio" name="q1" value="a"> Salah</label>
+                <label><input type="radio" name="q1" value="b"> Shahadah</label>
+                <label><input type="radio" name="q1" value="c"> Zakat</label>
+              </div>
+            </div>
+            <div>
+              <label>2) Which book is the word of Allah?</label>
+              <div>
+                <label><input type="radio" name="q2" value="a"> Quran</label>
+                <label><input type="radio" name="q2" value="b"> Hadith</label>
+                <label><input type="radio" name="q2" value="c"> Seerah</label>
+              </div>
+            </div>
+            <div>
+              <label>3) What do we say before eating?</label>
+              <div>
+                <label><input type="radio" name="q3" value="a"> Alhamdulillah</label>
+                <label><input type="radio" name="q3" value="b"> SubhanAllah</label>
+                <label><input type="radio" name="q3" value="c"> Bismillah</label>
+              </div>
+            </div>
+            <div>
+              <label>4) Who is the final Prophet?</label>
+              <div>
+                <label><input type="radio" name="q4" value="a"> Prophet Isa (AS)</label>
+                <label><input type="radio" name="q4" value="b"> Prophet Muhammad (ﷺ)</label>
+                <label><input type="radio" name="q4" value="c"> Prophet Musa (AS)</label>
+              </div>
+            </div>
+            <div>
+              <label>5) Which direction do Muslims pray?</label>
+              <div>
+                <label><input type="radio" name="q5" value="a"> Towards the Kaaba</label>
+                <label><input type="radio" name="q5" value="b"> To the east</label>
+                <label><input type="radio" name="q5" value="c"> To the west</label>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:10px;">Submit Quiz</button>
+        </form>
+      </section>
+
+      <section class="card" style="margin-top:16px;">
+        <h2>YouTube Kids Playlist</h2>
+        <p>Watch kid-friendly Islamic songs and stories.</p>
+        <div>
+          <!-- Replace the list ID with your chosen playlist -->
+          <iframe
+            style="width:100%; height:320px; border:0; border-radius:12px; box-shadow: var(--shadow);"
+            src="https://www.youtube-nocookie.com/embed/videoseries?list=PL_IMediaC_Kids_Sample"
+            title="Islamic Kids Playlist"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <p style="opacity:.8; margin-top:8px;">If the playlist doesn't load, open YouTube: <a href="https://www.youtube.com/results?search_query=islamic+kids+playlist" target="_blank" rel="noopener">Islamic kids playlist</a></p>
+      </section>
+
+      <section class="cta">
+        <p>Earn points every time you play! Come back daily for new quizzes.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
+    <script src="scripts/main.js"></script>
+  </body>
+</html>
