@@ -893,8 +893,41 @@ async function initPrayerTimes() {
   const nextCountdownEl = document.getElementById('nextPrayerCountdown');
   const monthlyLink = document.getElementById('prayerMonthlyLink');
   const refreshBtn = document.getElementById('prayerRefresh');
+  const citySelect = document.getElementById('prayerCity');
+  const methodSelect = document.getElementById('prayerMethod');
   if (!grid || !status) return;
-  let timings = null; let tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; let loc = { lat: 51.5074, lon: -0.1278 };
+  let timings = null;
+  let tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const CITY_MAP = {
+    London: { lat: 51.5074, lon: -0.1278 },
+    Birmingham: { lat: 52.4862, lon: -1.8904 },
+    Manchester: { lat: 53.4808, lon: -2.2426 },
+    Leeds: { lat: 53.7997, lon: -1.5492 },
+    Bradford: { lat: 53.7939, lon: -1.7521 },
+    Glasgow: { lat: 55.8642, lon: -4.2518 },
+    Luton: { lat: 51.8787, lon: -0.42 }
+  };
+  let selectedCity = localStorage.getItem('IMK_PRAYER_CITY') || 'London';
+  let loc = CITY_MAP[selectedCity] || CITY_MAP['London'];
+  let methodId = parseInt(localStorage.getItem('IMK_PRAYER_METHOD') || '3', 10); // default MWL
+  if (citySelect) {
+    // initialize select value
+    citySelect.value = selectedCity in CITY_MAP ? selectedCity : 'London';
+    citySelect.addEventListener('change', () => {
+      selectedCity = citySelect.value;
+      localStorage.setItem('IMK_PRAYER_CITY', selectedCity);
+      loc = CITY_MAP[selectedCity] || CITY_MAP['London'];
+      fetchTimings();
+    });
+  }
+  if (methodSelect) {
+    methodSelect.value = String(methodId);
+    methodSelect.addEventListener('change', () => {
+      methodId = parseInt(methodSelect.value, 10) || 3;
+      localStorage.setItem('IMK_PRAYER_METHOD', String(methodId));
+      fetchTimings();
+    });
+  }
   function renderTimings() {
     if (!timings) return;
     const names = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
@@ -903,8 +936,8 @@ async function initPrayerTimes() {
       return `<div class="prayer-item"><div class="prayer-name">${n}</div><div class="prayer-time">${t}</div></div>`;
     }).join('');
     // Do not imply geolocation-based accuracy; we no longer request location permission
-    status.textContent = `Prayer times (${tz})`;
-    if (monthlyLink) monthlyLink.href = `https://api.aladhan.com/v1/calendar?latitude=${loc.lat}&longitude=${loc.lon}&method=2`;
+    status.textContent = `Prayer times for ${selectedCity} (${tz})`;
+    if (monthlyLink) monthlyLink.href = `https://api.aladhan.com/v1/calendar?latitude=${loc.lat}&longitude=${loc.lon}&method=${methodId}`;
     updateNextCountdown();
   }
   function parseTimeToDate(t) {
@@ -932,7 +965,7 @@ async function initPrayerTimes() {
   async function fetchTimings() {
     status.textContent = 'Fetching prayer times…';
     try {
-      const url = `https://api.aladhan.com/v1/timings?latitude=${loc.lat}&longitude=${loc.lon}&method=2`;
+      const url = `https://api.aladhan.com/v1/timings?latitude=${loc.lat}&longitude=${loc.lon}&method=${methodId}`;
       const res = await fetch(url);
       const data = await res.json();
       timings = data && data.data && data.data.timings ? data.data.timings : null;

@@ -97,6 +97,27 @@
       <!-- Prayer Times Widget -->
       <section class="card" id="prayerTimes" aria-label="Prayer Times">
         <h2 class="section-title">Prayer Times</h2>
+        <div class="prayer-controls" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:6px 0 10px;">
+          <label for="prayerCity">City</label>
+          <select id="prayerCity" class="input" aria-label="Select city">
+            <option value="London">London</option>
+            <option value="Birmingham">Birmingham</option>
+            <option value="Manchester">Manchester</option>
+            <option value="Leeds">Leeds</option>
+            <option value="Bradford">Bradford</option>
+            <option value="Glasgow">Glasgow</option>
+            <option value="Luton">Luton</option>
+          </select>
+          <label for="prayerMethod">Method</label>
+          <select id="prayerMethod" class="input" aria-label="Select calculation method">
+            <option value="3">Muslim World League</option>
+            <option value="1">Karachi (Hanafi)</option>
+            <option value="2">ISNA</option>
+            <option value="4">Umm al-Qura, Makkah</option>
+            <option value="5">Egyptian</option>
+            <option value="14">Moonsighting Committee</option>
+          </select>
+        </div>
   <div id="prayerStatus" class="muted" aria-live="polite">Loading prayer times…</div>
         <div class="prayer-grid" id="prayerGrid" aria-live="polite"></div>
         <div class="prayer-next" id="prayerNext">Next: <span id="nextPrayerName">—</span> in <span id="nextPrayerCountdown">--:--:--</span></div>
