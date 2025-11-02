@@ -839,7 +839,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initPrayerTimes();
   bindMiniPlayer();
   initToggles();
-  initNewsletterModal();
+  // Initialize newsletter modal only if present
+  if (document.getElementById('newsletterModal')) {
+    initNewsletterModal();
+  }
   initScrollTop();
 });
 
