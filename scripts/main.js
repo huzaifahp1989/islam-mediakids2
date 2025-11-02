@@ -445,6 +445,7 @@ function renderHomeSlider() {
 
 // Bootstrapping per page
 document.addEventListener('DOMContentLoaded', () => {
+  enableMobileMenu();
   // Enable basic hooks depending on page elements present
   bindAuthForm();
   bindQuiz();
@@ -457,6 +458,45 @@ document.addEventListener('DOMContentLoaded', () => {
   bindRadioPlayer();
   bindQuranPage();
 });
+
+// Mobile menu toggle
+function enableMobileMenu() {
+  const header = document.querySelector('.site-header .header-inner');
+  const nav = header ? header.querySelector('.nav') : null;
+  if (!header || !nav) return;
+  if (header.querySelector('.menu-toggle')) return; // already added
+
+  const btn = document.createElement('button');
+  btn.className = 'menu-toggle';
+  btn.setAttribute('aria-label', 'Toggle menu');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.type = 'button';
+  btn.innerHTML = '☰ Menu';
+  header.insertBefore(btn, nav);
+
+  btn.addEventListener('click', () => {
+    const open = document.body.classList.toggle('menu-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // Close menu on link click (mobile UX)
+  nav.querySelectorAll('a.nav-link').forEach(a => {
+    a.addEventListener('click', () => {
+      if (document.body.classList.contains('menu-open')) {
+        document.body.classList.remove('menu-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  // Ensure menu closes when resizing to desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768 && document.body.classList.contains('menu-open')) {
+      document.body.classList.remove('menu-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
 
 // Quran page: load surahs, render ayahs, and play verse-by-verse audio
 function bindQuranPage() {

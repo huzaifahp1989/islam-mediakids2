@@ -1,8 +1,8 @@
 [build]
-  publish =
+  publish = "."
+  
 
-
-# Force HTTPS and root domain
+# Force HTTPS and canonical root domain
 [[redirects]]
   from = "http://imediackids.com/*"
   to = "https://imediackids.com/:splat"
@@ -20,3 +20,16 @@
   to = "https://imediackids.com/:splat"
   status = 301
   force = true
+
+# Security and caching headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
