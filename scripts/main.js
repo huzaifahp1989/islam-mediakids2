@@ -902,7 +902,8 @@ async function initPrayerTimes() {
       const t = timings[n];
       return `<div class="prayer-item"><div class="prayer-name">${n}</div><div class="prayer-time">${t}</div></div>`;
     }).join('');
-    status.textContent = `Times for your location (${tz})`;
+    // Do not imply geolocation-based accuracy; we no longer request location permission
+    status.textContent = `Prayer times (${tz})`;
     if (monthlyLink) monthlyLink.href = `https://api.aladhan.com/v1/calendar?latitude=${loc.lat}&longitude=${loc.lon}&method=2`;
     updateNextCountdown();
   }
@@ -939,8 +940,8 @@ async function initPrayerTimes() {
       renderTimings(); startCountdown();
     } catch (e) { console.error('Prayer times error', e); status.textContent = 'Failed to load prayer times'; }
   }
-  function geolocate(){ if (!navigator.geolocation) { fetchTimings(); return; }
-    navigator.geolocation.getCurrentPosition(pos => { loc = { lat: pos.coords.latitude, lon: pos.coords.longitude }; fetchTimings(); }, err => { console.warn('Geolocation failed', err); fetchTimings(); }, { timeout: 8000 }); }
+  // Remove geolocation permission request; always use default location (London) unless overridden elsewhere
+  function geolocate(){ fetchTimings(); }
   refreshBtn && refreshBtn.addEventListener('click', fetchTimings);
   geolocate();
 }
