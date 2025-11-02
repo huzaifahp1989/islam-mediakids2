@@ -74,10 +74,20 @@
             namesEl.appendChild(drop);
           });
         }
-        function checkDone(){ if(matched===pairs.length){ statusEl.textContent='✅ Great job!'; } }
+        function checkDone(){
+          if(matched===pairs.length){
+            statusEl.textContent='✅ Great job!';
+            try {
+              if (typeof currentUser === 'function' && typeof addPoints === 'function') {
+                const u = currentUser();
+                if (u) { addPoints(u.id, 1, 'arabic-letter-match'); }
+              }
+            } catch {}
+            alert('Points earned: 1');
+          }
+        }
         build();
       })();
     </script>
   </body>
   </html>
-

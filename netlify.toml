@@ -1,6 +1,9 @@
 [build]
   publish = "."
 command = ""
+
+[functions]
+  directory = "netlify/functions"
 # Force HTTPS and canonical root domain
 [[redirects]]
   from = "http://imediackids.com/*"
@@ -20,6 +23,12 @@ command = ""
   status = 301
   force = true
 
+# Proxy API calls to Netlify Functions in production
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
 # Security and caching headers
 [[headers]]
   for = "/*"
@@ -32,3 +41,20 @@ command = ""
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Ensure HTML pages are not cached aggressively
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Ensure CSS and JS update immediately (no long caching without fingerprints)
+[[headers]]
+  for = "/styles.css"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/scripts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

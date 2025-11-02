@@ -25,17 +25,22 @@
 
     <main class="container">
       <section class="card">
-        <h2>Fun HTML5 Games</h2>
-        <p>Play simple, kid-friendly games. More coming soon!</p>
+        <h2>Quizzes</h2>
+        <p>Test your knowledge and earn points!</p>
         <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-          <a class="icon-card" href="balloon-pop.html">🎈 Balloon Pop</a>
-          <a class="icon-card" href="puzzle-match.html">🧩 Puzzle Match</a>
-          <a class="icon-card" href="car-race.html">🚗 Car Race</a>
+          <a class="icon-card" href="islamic-quiz.html">🧠 Islamic Quiz (Topics)</a>
           <a class="icon-card" href="math-quiz.html">➗ Math Quiz</a>
           <a class="icon-card" href="spelling-bee.html">🐝 Spelling Bee</a>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:16px;">
+        <h2>Games</h2>
+        <p>Play simple, kid-friendly games. More coming soon!</p>
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+          <a class="icon-card" href="puzzle-match.html">🧩 Puzzle Match</a>
           <a class="icon-card" href="shape-sorter.html">🔷 Shape Sorter</a>
           <a class="icon-card" href="color-match.html">🎨 Color Match</a>
-          <a class="icon-card" href="counting-stars.html">⭐ Counting Stars</a>
           <a class="icon-card" href="arabic-letter-match.html">🔤 Arabic Letter Match</a>
           <a class="icon-card" href="time-teller.html">⏰ Time Teller</a>
         </div>
@@ -43,7 +48,7 @@
 
       <section id="quiz" class="card" style="margin-top:16px;">
         <h2>Daily Islamic Quiz</h2>
-        <p id="quizNotice">Earn points every time you play!</p>
+        <p id="quizNotice">Earn 1 point each time you play!</p>
         <form id="quizForm">
           <div class="grid" style="grid-template-columns: 1fr;">
             <div>
@@ -90,30 +95,14 @@
           <button type="submit" class="btn btn-primary" style="margin-top:10px;">Submit Quiz</button>
         </form>
       </section>
-
-      <section class="card" style="margin-top:16px;">
-        <h2>YouTube Kids Playlist</h2>
-        <p>Watch kid-friendly Islamic songs and stories.</p>
-        <div>
-          <!-- Replace the list ID with your chosen playlist -->
-          <iframe
-            style="width:100%; height:320px; border:0; border-radius:12px; box-shadow: var(--shadow);"
-            src="https://www.youtube-nocookie.com/embed/videoseries?list=PL_IMediaC_Kids_Sample"
-            title="Islamic Kids Playlist"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <p style="opacity:.8; margin-top:8px;">If the playlist doesn't load, open YouTube: <a href="https://www.youtube.com/results?search_query=islamic+kids+playlist" target="_blank" rel="noopener">Islamic kids playlist</a></p>
-      </section>
+      <!-- YouTube Kids Playlist removed per request -->
 
       <section class="cta">
-        <p>Earn points every time you play! Come back daily for new quizzes.</p>
+        <p>Earn 1 point per quiz or game. Come back daily for new quizzes.</p>
       </section>
     </main>
 
     <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
     <script src="scripts/main.js"></script>
   </body>
-</html>
+ </html>

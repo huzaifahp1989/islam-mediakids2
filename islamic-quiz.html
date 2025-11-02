@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Islamic Quiz – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🧠</div><h1 class="site-title">Islamic Quiz</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="quran.html" class="nav-link">📗 Quran</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>Choose Topic and Difficulty</h2>
+        <p>Answer questions to learn and earn points. 1 point per correct answer.</p>
+
+        <div id="quizApp">
+          <div id="quizSetup" class="grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label for="quizTopic"><strong>Topic</strong></label>
+              <select id="quizTopic" class="form-select">
+                <option value="seerah">Seerah</option>
+                <option value="hadith">Hadith</option>
+                <option value="fiqh">Fiqh</option>
+                <option value="akhlaq">Akhlaq</option>
+                <option value="adaab">Adaab</option>
+                <option value="duas">Duas</option>
+              </select>
+            </div>
+            <div>
+              <label for="quizDifficulty"><strong>Difficulty</strong></label>
+              <select id="quizDifficulty" class="form-select">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <button id="quizStartBtn" class="btn btn-primary">Start Quiz</button>
+              <span id="quizSetupMsg" class="text-muted" style="margin-left:8px;">You must be logged in to earn points.</span>
+            </div>
+          </div>
+
+          <div id="quizPlay" class="hidden">
+            <div class="card" style="margin-top:12px;">
+              <div class="flex" style="justify-content: space-between; align-items:center;">
+                <div><strong id="quizTitle">Topic</strong> — <span id="quizLevel">Level</span></div>
+                <div>Question <span id="quizIndex">1</span>/<span id="quizTotal">0</span></div>
+              </div>
+            </div>
+            <div id="quizQuestion" style="margin-top:12px;">
+              <!-- Filled by scripts/main.js -->
+            </div>
+            <div class="flex" style="gap:8px; margin-top:12px;">
+              <button id="quizSubmitBtn" class="btn btn-primary">Submit Answer</button>
+              <button id="quizNextBtn" class="btn btn-secondary hidden">Next</button>
+            </div>
+            <p id="quizFeedback" class="text-muted" style="margin-top:8px;"></p>
+          </div>
+
+          <div id="quizResult" class="hidden" style="margin-top:16px;">
+            <h3>Great job!</h3>
+            <p>You scored <strong id="quizScore">0</strong>/<span id="quizOutOf">0</span>. Points earned: <strong id="quizPoints">0</strong> (fixed at 1 per quiz).</p>
+            <div class="flex" style="gap:8px;">
+              <a href="leaderboard.html" class="btn btn-primary">View Leaderboard</a>
+              <a href="games.html" class="btn btn-outline">Back to Games</a>
+              <button id="quizRestartBtn" class="btn btn-secondary">Play Again</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
+    <script src="scripts/main.js"></script>
+  </body>
+ </html>

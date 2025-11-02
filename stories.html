@@ -24,38 +24,82 @@
     </header>
 
     <main class="container">
-      <section class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
-        <!-- 5 sample stories -->
-        <article class="card">
-          <h3>The Kind Neighbor</h3>
-          <p>A story about helping others and sharing food.</p>
-          <button class="btn btn-secondary" data-award-story>Read More</button>
-        </article>
-        <article class="card">
-          <h3>Honesty Wins</h3>
-          <p>A child returns a lost coin and is rewarded.</p>
-          <button class="btn btn-secondary" data-award-story>Read More</button>
-        </article>
-        <article class="card">
-          <h3>Patience of the Prophet</h3>
-          <p>Learning sabr (patience) through everyday challenges.</p>
-          <button class="btn btn-secondary" data-award-story>Read More</button>
-        </article>
-        <article class="card">
-          <h3>Sharing is Caring</h3>
-          <p>Two friends learn to share toys and treats.</p>
-          <button class="btn btn-secondary" data-award-story>Read More</button>
-        </article>
-        <article class="card">
-          <h3>Grateful Hearts</h3>
-          <p>Saying Alhamdulillah for the blessings we have.</p>
-          <button class="btn btn-secondary" data-award-story>Read More</button>
-        </article>
+      <section class="card">
+        <h2 class="section-title">Islamic Stories</h2>
+        <p style="text-align:center;">Lessons and morals for kids and parents.</p>
+        <div class="articles-grid" id="storiesGrid" aria-live="polite"></div>
       </section>
     </main>
 
     <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p></div></footer>
     <script src="scripts/main.js"></script>
+    <script>
+      // Load stories from backend content API (type: story)
+      (async function loadStories(){
+        const grid = document.getElementById('storiesGrid');
+        if (!grid) return;
+        const isLocal = location.hostname === 'localhost' || location.hostname.startsWith('127.');
+        const API_BASE = isLocal ? 'http://localhost:3001/api' : (window.API_BASE || '/api');
+        try {
+          const res = await fetch(`${API_BASE}/content/story`);
+          const items = await res.json();
+          if (!Array.isArray(items)) throw new Error('Invalid stories response');
+
+          if (items.length === 0) {
+            grid.innerHTML = '<p style="text-align:center; opacity:.8;">Stories will be available soon.</p>';
+            return;
+          }
+
+          grid.innerHTML = items.map(story => renderStoryCard(story)).join('');
+          bindExpandButtons();
+        } catch (err) {
+          console.error('Stories load error:', err);
+          grid.innerHTML = '<p style="text-align:center; opacity:.8;">Could not load stories right now.</p>';
+        }
+
+        function renderStoryCard(s) {
+          const title = sanitize(s.title || 'Untitled');
+          const img = s.image_url ? sanitize(s.image_url) : 'assets/favicon.svg';
+          const en = (s.content_en || '').trim();
+          const excerpt = sanitize(en.length > 220 ? en.slice(0, 217) + '…' : en);
+          const ar = (s.content_ar || '').trim();
+          // Use article card layout for consistency
+          return `
+            <article class="article-card">
+              <div class="article-image" style="background-image:url('${img}')"></div>
+              <div class="article-content">
+                <h3>${title}</h3>
+                <p>${excerpt}</p>
+                <button class="btn btn-secondary" data-expand-story data-title="${escapeAttr(title)}" data-en="${escapeAttr(en)}" data-ar="${escapeAttr(ar)}">Read More</button>
+              </div>
+            </article>
+          `;
+        }
+
+        function bindExpandButtons(){
+          document.querySelectorAll('[data-expand-story]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const title = btn.getAttribute('data-title') || 'Story';
+              const en = btn.getAttribute('data-en') || '';
+              const ar = btn.getAttribute('data-ar') || '';
+              const full = `${title}\n\n${en}${ar ? `\n\n${ar}` : ''}`.trim();
+              alert(full);
+            });
+          });
+        }
+
+        function sanitize(str){
+          return String(str).replace(/[&<>"']/g, s => ({
+            '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'
+          })[s]);
+        }
+
+        function escapeAttr(str){
+          return String(str || '').replace(/["'<>]/g, s => ({
+            '"':'&quot;','\'':'&#39;','<':'&lt;','>':'&gt;'
+          })[s]);
+        }
+      })();
+    </script>
   </body>
 </html>
-

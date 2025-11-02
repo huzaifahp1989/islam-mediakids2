@@ -8,9 +8,19 @@
     <link rel="stylesheet" href="styles.css" />
     <!-- Use local SVG favicon to avoid 404s -->
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <!-- Fonts for Arabic (Amiri) and clean UI (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   </head>
   <body class="theme-clouds">
     <header class="site-header">
+      <!-- Top Moving Announcement Bar -->
+      <div class="announcement-bar" aria-label="Announcements">
+        <div class="announcement-track">
+          <span>Welcome to Islam Media Central — Your Hub for Quran, Hadith, and Islamic Knowledge • </span>
+          <span>Listen to Live Radio | Join Kids Competitions | New Podcasts Uploaded Weekly! • </span>
+          <span>Download Our Mobile App Coming Soon! • </span>
+        </div>
+      </div>
       <div class="container header-inner">
         <div class="logo-title">
           <div class="logo-circle">🌟</div>
@@ -27,33 +37,86 @@
           <a href="contact.html" class="nav-link">📩 Contact</a>
           <a href="auth.html" class="nav-link btn btn-outline">Join Now</a>
         </nav>
+        <!-- Header Controls: Language & Theme toggles -->
+        <div class="header-controls">
+          <button id="langToggle" class="btn btn-outline" type="button" aria-label="Toggle language">EN / اردو</button>
+          <button id="themeToggle" class="btn btn-outline" type="button" aria-label="Toggle theme">☀️ / 🌙</button>
+        </div>
       </div>
     </header>
 
+    <!-- Hero Section (Full-width Slider) -->
+    <section id="homeSlider" class="hero-slider full-bleed" aria-label="Main Features">
+      <div class="slider" role="region" aria-roledescription="carousel" aria-label="Main Features">
+        <div class="slides" id="sliderSlides">
+          <!-- Populated by scripts/main.js -->
+        </div>
+        <button class="slider-nav prev" id="sliderPrev" aria-label="Previous">‹</button>
+        <button class="slider-nav next" id="sliderNext" aria-label="Next">›</button>
+        <div class="slider-dots" id="sliderDots" aria-label="Slide indicators"></div>
+      </div>
+    </section>
+
     <main class="container">
       <section class="hero">
-        <h2>Welcome to IMediaC Kids – Learn, Play & Grow!</h2>
-        <p>Fun, colourful and educational Islamic activities for kids.</p>
+        <h2>IMediaC Kids Zone – Learn, Play & Grow</h2>
+        <p>Safe, fun and structured Islamic learning with games, quizzes and stories.</p>
         <div class="hero-actions">
           <a href="auth.html" class="btn btn-primary">Join Now</a>
           <a href="games.html" class="btn btn-secondary">Start Playing</a>
         </div>
       </section>
 
-      <!-- Islamic Quotes & Images Slider -->
-      <section id="homeSlider" class="card" aria-label="Islamic Quotes Slider">
-        <div class="slider" role="region" aria-roledescription="carousel" aria-label="Islamic Quotes">
-          <div class="slides" id="sliderSlides">
-            <!-- Populated by scripts/main.js -->
+      <!-- Quran Ayah & Hadith of the Day -->
+      <section class="card gradient-soft" id="qhd" aria-label="Quran Ayah & Hadith of the Day">
+        <h2 class="section-title">Quran Ayah & Hadith of the Day</h2>
+        <div class="grid daily-grid">
+          <div class="card">
+            <h3>Quran Ayah</h3>
+            <div class="arabic" id="ayah">Loading Ayah…</div>
+            <div class="daily-meta" id="ayahRef"></div>
+            <div class="daily-actions">
+              <button id="playAyahBtn" class="btn btn-secondary" type="button">▶ Play Audio</button>
+              <button id="copyAyahBtn" class="btn btn-outline" type="button">⧉ Copy</button>
+              <button id="shareAyahBtn" class="btn btn-outline" type="button">⇪ Share</button>
+            </div>
           </div>
-          <button class="slider-nav prev" id="sliderPrev" aria-label="Previous">‹</button>
-          <button class="slider-nav next" id="sliderNext" aria-label="Next">›</button>
-          <div class="slider-dots" id="sliderDots" aria-label="Slide indicators"></div>
+          <div class="card">
+            <h3>Hadith</h3>
+            <div class="arabic" id="hadith">Loading Hadith…</div>
+            <div class="daily-meta" id="hadithRef"></div>
+            <div class="daily-actions">
+              <button id="copyHadithBtn" class="btn btn-outline" type="button">⧉ Copy</button>
+              <button id="shareHadithBtn" class="btn btn-outline" type="button">⇪ Share</button>
+            </div>
+          </div>
+        </div>
+        <audio id="ayahAudio" preload="none" style="display:none"></audio>
+      </section>
+
+      <!-- Prayer Times Widget -->
+      <section class="card" id="prayerTimes" aria-label="Prayer Times">
+        <h2 class="section-title">Prayer Times</h2>
+        <div id="prayerStatus" class="muted" aria-live="polite">Detecting your location…</div>
+        <div class="prayer-grid" id="prayerGrid" aria-live="polite"></div>
+        <div class="prayer-next" id="prayerNext">Next: <span id="nextPrayerName">—</span> in <span id="nextPrayerCountdown">--:--:--</span></div>
+        <div class="prayer-actions">
+          <button id="prayerRefresh" class="btn btn-outline" type="button">Refresh</button>
+          <a id="prayerMonthlyLink" class="btn btn-secondary" href="#" target="_blank" rel="noopener">View Monthly Timetable</a>
         </div>
       </section>
 
+      <section class="stats" aria-label="Highlights">
+        <div class="stat"><div class="num">12+</div><div class="label">Interactive Games</div></div>
+        <div class="stat"><div class="num">7</div><div class="label">Learning Paths</div></div>
+        <div class="stat"><div class="num">100+</div><div class="label">Active Learners</div></div>
+        <div class="stat"><div class="num">Monthly</div><div class="label">Prizes & Badges</div></div>
+      </section>
+
+      <!-- Slider moved above as full-width hero -->
+
       <section id="radio" class="card" aria-label="Islamic Radio">
-        <audio id="radioPlayer" preload="none" src="https://a4.asurahosting.com:7820/radio.mp3" style="display:none">
+        <audio id="radioPlayer" preload="none" data-src="https://a4.asurahosting.com:7820/radio.mp3" style="display:none">
           Your browser does not support the audio element.
           <a href="https://a4.asurahosting.com:7820/radio.mp3" target="_blank" rel="noopener">Open stream</a>.
         </audio>
@@ -123,15 +186,277 @@
         <p>Kids earn points for every quiz or game. Top 3 win monthly prizes!</p>
         <a href="leaderboard.html" class="btn btn-outline">View Leaderboard</a>
       </section>
+
+      <section class="card">
+        <h2 class="section-title">Core Values</h2>
+        <div class="values-grid">
+          <div class="card value-card"><div class="icon">❤️</div><h3>Love of Allah</h3><p>Build a loving bond through daily remembrance.</p></div>
+          <div class="card value-card"><div class="icon">🤝</div><h3>Character (Akhlaq)</h3><p>Practice honesty, patience and kindness.</p></div>
+          <div class="card value-card"><div class="icon">🌟</div><h3>Respect & Care</h3><p>Respect parents, teachers and community.</p></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">About Islam Media Central</h2>
+        <p style="text-align:center;">Islam Media Central brings authentic Islamic content including Quran, Hadith, Podcasts, Kids Learning, and Radio — connecting Muslims worldwide through digital media.</p>
+        <div class="learn-grid">
+          <a class="icon-card" href="quran.html">📗 Quran with Translation</a>
+          <a class="icon-card" href="learn.html">📚 Complete Hadith Books</a>
+          <a class="icon-card" href="stories.html">🎙️ Podcasts & Nasheeds</a>
+          <a class="icon-card" href="games.html">🧠 Kids Learning Corner</a>
+          <a class="icon-card" href="blog.html">🕋 Islamic Blog & Articles</a>
+          <a class="icon-card" href="#radio">📻 Live Radio Stream</a>
+          <a class="icon-card" href="games.html#quiz">🎮 Islamic Quizzes & Competitions</a>
+        </div>
+      </section>
+
+      <!-- Kids Zone Promo -->
+      <section class="card kids-promo" aria-label="Kids Zone Preview">
+        <div class="kids-promo-inner">
+          <div class="kids-stars" aria-hidden="true"><span>★</span><span>✦</span><span>★</span><span>✦</span></div>
+          <h2>Play & Learn – Visit IMediaC Kids Zone</h2>
+          <p>Colourful games, quizzes, stories and rewards for children.</p>
+          <a href="https://imediackids.com" target="_blank" rel="noopener" class="btn btn-primary">Visit Kids Site</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">Monthly Learning Competition</h2>
+        <p style="text-align:center;">Earn points by playing and learning. Win badges and prizes every month!</p>
+        <div style="text-align:center;">
+          <a href="leaderboard.html" class="btn btn-secondary">See Leaderboard</a>
+          <a href="prizes.html" class="btn btn-outline">View Prizes</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">Join Our Community</h2>
+        <p style="text-align:center;">Parents and kids learn together, share progress and celebrate wins.</p>
+        <div style="text-align:center;">
+          <a href="auth.html" class="btn btn-primary">Create Your Account</a>
+        </div>
+      </section>
+
+      <section class="card" id="latestArticles">
+        <h2 class="section-title">From Our Blog — IMediaC.com</h2>
+        <p style="text-align:center;">Latest posts from our WordPress site</p>
+        <div class="articles-grid" id="articlesGrid" aria-live="polite"></div>
+        <div style="text-align:center; margin-top:8px;">
+          <div id="articlesStatus" class="muted" role="status" aria-live="polite" style="display:none;"></div>
+          <button id="articlesRetry" class="btn btn-outline" type="button" style="display:none; margin-top:8px;">Retry</button>
+        </div>
+        <div style="text-align:center; margin-top:12px;">
+          <a href="https://imediac.com/" target="_blank" rel="noopener" class="btn btn-outline">View all articles</a>
+        </div>
+      </section>
+
+      <!-- Apps Coming Soon -->
+      <section class="card" id="appsComingSoon">
+        <h2 class="section-title">Apps Coming Soon</h2>
+        <p style="text-align:center;">Our official Islam Media Central App is coming soon — explore Quran, Hadith, Podcasts, and Kids Zone anytime, anywhere.</p>
+        <div class="apps-grid">
+          <div class="app-card">
+            <div class="app-mockup">📱</div>
+            <h3>Android</h3>
+            <p class="muted">Google Play (Coming Soon)</p>
+          </div>
+          <div class="app-card">
+            <div class="app-mockup">📱</div>
+            <h3>iOS</h3>
+            <p class="muted">App Store (Coming Soon)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Access Tabs -->
+      <section class="quick-access" aria-label="Quick Access">
+        <div class="tabs">
+          <a href="#homeSlider" class="tab">Home</a>
+          <a href="quran.html" class="tab">Quran</a>
+          <a href="learn.html" class="tab">Hadith</a>
+          <a href="#latestArticles" class="tab">Blog</a>
+          <a href="games.html" class="tab">Kids Zone</a>
+          <a href="stories.html" class="tab">Podcasts</a>
+          <a href="contact.html" class="tab">Contact</a>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">
       <div class="container">
-        <p>© IMediaC Kids – Learn, Play & Grow – www.imediackids.com</p>
+        <div class="footer-glow" aria-hidden="true"></div>
+        <section class="newsletter">
+          <h3>Join Our Community</h3>
+          <form action="https://formsubmit.co/info@imediac.com" method="POST" target="_blank">
+            <input type="hidden" name="_subject" value="Newsletter Signup" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="email" name="email" placeholder="Enter your email" required />
+            <button class="btn btn-secondary" type="submit">Subscribe</button>
+          </form>
+        </section>
+        <div class="socials">
+          <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube">▶️</a>
+          <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">📸</a>
+          <a href="https://tiktok.com" target="_blank" rel="noopener" aria-label="TikTok">🎵</a>
+          <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook">📘</a>
+          <a href="https://x.com" target="_blank" rel="noopener" aria-label="X/Twitter">𝕏</a>
+        </div>
+        <p>Contact: <a href="mailto:info@imediac.com">info@imediac.com</a></p>
+        <p>© 2025 Islam Media Central – Powered by IMediaC.com</p>
+        <button id="scrollTopBtn" class="scroll-top" type="button" aria-label="Scroll to top">↑</button>
       </div>
     </footer>
 
     <script src="scripts/main.js"></script>
+    <!-- Floating WhatsApp Contact Button -->
+    <a id="whatsappFloat" class="whatsapp-float" href="https://wa.me/447123456789" target="_blank" rel="noopener" aria-label="Contact on WhatsApp">💬</a>
+
+    <!-- Newsletter Modal -->
+    <div id="newsletterModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="newsletterTitle" aria-modal="false" style="display:none;">
+      <div class="modal-backdrop" id="newsletterBackdrop"></div>
+      <div class="modal-content">
+        <button class="modal-close" id="newsletterClose" type="button" aria-label="Close">✕</button>
+        <h3 id="newsletterTitle">Stay in the loop</h3>
+        <p>Get Quran/Hadith updates, kids activities and new podcasts.</p>
+        <form id="newsletterForm">
+          <input type="email" id="newsletterEmail" placeholder="Enter your email" required />
+          <button class="btn btn-primary" type="submit">Subscribe</button>
+        </form>
+        <div id="newsletterMsg" class="muted" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Floating Mini Player -->
+    <div id="miniPlayer" class="mini-player" aria-live="polite" style="display:none;">
+      <button id="miniPlayBtn" class="btn btn-secondary" type="button" aria-label="Play/Pause">▶</button>
+      <span id="miniTrack">Live Radio</span>
+      <button id="miniCloseBtn" class="btn btn-outline" type="button" aria-label="Close">✕</button>
+    </div>
+    <script>
+      // Load latest 4 articles with images from backend feed endpoint
+      (async function loadLatestArticles(){
+        const grid = document.getElementById('articlesGrid');
+        const statusEl = document.getElementById('articlesStatus');
+        const retryBtn = document.getElementById('articlesRetry');
+        if (!grid) return;
+        const isLocal = location.hostname === 'localhost' || location.hostname.startsWith('127.');
+        const API_BASE = isLocal ? 'http://localhost:3001/api' : (window.API_BASE || '/api');
+
+        function setStatus(message, showRetry = false){
+          if (statusEl) {
+            statusEl.textContent = message || '';
+            statusEl.style.display = message ? 'block' : 'none';
+          }
+          if (retryBtn) {
+            retryBtn.style.display = showRetry ? 'inline-block' : 'none';
+            retryBtn.disabled = !showRetry ? false : false;
+          }
+        }
+
+        async function fetchAndRender(){
+          setStatus('Loading latest articles...', false);
+          try {
+            // Primary: backend API
+            const res = await fetch(`${API_BASE}/feed/latest?limit=4`);
+            if (!res.ok) throw new Error(`Backend feed error: ${res.status}`);
+            const data = await res.json();
+            if (!data.success || !Array.isArray(data.items)) throw new Error('Invalid feed response');
+            grid.innerHTML = data.items.map(item => articleCard(item)).join('');
+            setStatus('', false);
+          } catch (err) {
+            console.warn('Primary feed failed, trying fallback proxy...', err);
+            try {
+              // Fallback for local preview: use AllOrigins CORS proxy to parse WordPress RSS on client
+              const rssUrl = encodeURIComponent('https://imediac.com/feed');
+              const res2 = await fetch(`https://api.allorigins.win/raw?url=${rssUrl}`);
+              if (!res2.ok) throw new Error(`Proxy feed error: ${res2.status}`);
+              const xmlText = await res2.text();
+              const items = parseRssItems(xmlText).slice(0, 4);
+              grid.innerHTML = items.map(item => articleCard(item)).join('');
+              setStatus('', false);
+            } catch (err2) {
+              console.error('Articles load error (fallback failed):', err2);
+              grid.innerHTML = '';
+              setStatus('Could not load latest articles. Please try again.', true);
+            }
+          }
+        }
+
+        retryBtn?.addEventListener('click', () => {
+          fetchAndRender();
+        });
+
+        fetchAndRender();
+
+        function articleCard(item){
+          const img = item.image ? sanitize(item.image) : 'assets/favicon.svg';
+          const title = sanitize(item.title || 'Untitled');
+          const excerpt = sanitize(item.excerpt || '');
+          const link = sanitize(item.link || '#');
+          return `
+            <a class="article-card" href="${link}" target="_blank" rel="noopener" aria-label="${title}">
+              <div class="article-image" style="background-image:url('${img}')"></div>
+              <div class="article-content">
+                <h3>${title}</h3>
+                <p>${excerpt}</p>
+              </div>
+            </a>
+          `;
+        }
+
+        function sanitize(str){
+          return String(str).replace(/[&<>"']/g, s => ({
+            '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'
+          })[s]);
+        }
+
+        function parseRssItems(xmlText){
+          try {
+            const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+            const itemNodes = Array.from(doc.querySelectorAll('item'));
+            return itemNodes.map(node => {
+              const title = textContent(node, 'title');
+              const link = textContent(node, 'link');
+              const pubDate = textContent(node, 'pubDate');
+              const image = extractImageFromItem(node);
+              const excerpt = buildExcerptFromItem(node);
+              return { title, link, pubDate, image, excerpt };
+            });
+          } catch (e) {
+            console.error('RSS parse error:', e);
+            return [];
+          }
+        }
+
+        function textContent(parent, selector){
+          const el = parent.querySelector(selector);
+          return el ? (el.textContent || '').trim() : '';
+        }
+
+        function buildExcerptFromItem(node){
+          const cdata = node.querySelector('description');
+          const content = node.querySelector('content\\:encoded');
+          const text = (content ? content.textContent : (cdata ? cdata.textContent : '')) || '';
+          const clean = stripHtml(text).trim();
+          return clean.length > 180 ? clean.slice(0, 177) + '…' : clean;
+        }
+
+        function stripHtml(s){
+          return s ? String(s).replace(/<[^>]*>/g, '') : '';
+        }
+
+        function extractImageFromItem(node){
+          const enc = node.querySelector('enclosure');
+          if (enc && enc.getAttribute('url')) return enc.getAttribute('url');
+          const mediaContent = node.querySelector('media\\:content');
+          if (mediaContent && mediaContent.getAttribute('url')) return mediaContent.getAttribute('url');
+          const mediaThumb = node.querySelector('media\\:thumbnail');
+          if (mediaThumb && mediaThumb.getAttribute('url')) return mediaThumb.getAttribute('url');
+          const html = (node.querySelector('content\\:encoded') || node.querySelector('description'))?.textContent || '';
+          const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+          return match && match[1] ? match[1] : null;
+        }
+      })();
+    </script>
   </body>
 </html>
-

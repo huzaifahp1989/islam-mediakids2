@@ -64,7 +64,7 @@
           if (!first){ first = card; return; } moves++; movesEl.textContent = moves; busy = true; setTimeout(() => {
             if (first.dataset.symbol === card.dataset.symbol){ first.classList.add('matched'); card.classList.add('matched'); matched += 2; matchedEl.textContent = matched;
               if (matched === deck.length){ statusEl.textContent = 'You matched all pairs!';
-                try { if (typeof currentUser === 'function' && typeof addPoints === 'function'){ const u = currentUser(); if(u){ addPoints(u.id, 10 + Math.max(0, 20 - moves), 'puzzle-match'); } } } catch{}
+                try { if (typeof currentUser === 'function' && typeof addPoints === 'function'){ const u = currentUser(); if(u){ addPoints(u.id, 1, 'puzzle-match'); } } } catch{}
                 alert(`Great job! All matched in ${moves} moves.`);
               }
             } else {
@@ -80,4 +80,3 @@
     </script>
   </body>
 </html>
-

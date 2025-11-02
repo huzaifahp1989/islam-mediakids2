@@ -55,9 +55,10 @@
         const statusEl = document.getElementById('cmStatus');
         const nextBtn = document.getElementById('cmNext');
         let target = null;
+        let awarded = false;
 
         function build(){
-          statusEl.textContent=''; grid.innerHTML='';
+          statusEl.textContent=''; grid.innerHTML=''; awarded=false;
           target = colors[Math.floor(Math.random()*colors.length)];
           targetEl.textContent = target.name;
           const set = colors.slice().sort(()=>Math.random()-0.5).slice(0,6);
@@ -66,7 +67,19 @@
           set.forEach(c=>{
             const card = document.createElement('div'); card.className='cm-card'; card.style.background=c.hex; card.title=c.name;
             card.addEventListener('click', ()=>{
-              if(c.name===target.name){ statusEl.textContent='✅ Correct!'; }
+              if(c.name===target.name){
+                statusEl.textContent='✅ Correct!';
+                if(!awarded){
+                  try {
+                    if (typeof currentUser === 'function' && typeof addPoints === 'function') {
+                      const u = currentUser();
+                      if (u) { addPoints(u.id, 1, 'color-match'); }
+                    }
+                  } catch {}
+                  alert('Points earned: 1');
+                  awarded = true;
+                }
+              }
               else { statusEl.textContent='❌ Try again.'; }
             });
             grid.appendChild(card);
@@ -78,4 +91,3 @@
     </script>
   </body>
   </html>
-

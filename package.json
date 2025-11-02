@@ -1,0 +1,10 @@
+{
+  "name": "imediackids-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "IMediaC Kids static site with Netlify Functions",
+  "license": "MIT",
+  "dependencies": {
+    "rss-parser": "^3.12.0"
+  }
+}

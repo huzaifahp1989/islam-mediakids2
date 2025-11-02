@@ -74,10 +74,20 @@
             pool.appendChild(item);
           });
         }
-        function checkDone(){ if(matched===shapes.length){ statusEl.textContent='✅ All matched!'; } }
+        function checkDone(){
+          if(matched===shapes.length){
+            statusEl.textContent='✅ All matched!';
+            try {
+              if (typeof currentUser === 'function' && typeof addPoints === 'function') {
+                const u = currentUser();
+                if (u) { addPoints(u.id, 1, 'shape-sorter'); }
+              }
+            } catch {}
+            alert('Points earned: 1');
+          }
+        }
         build();
       })();
     </script>
   </body>
   </html>
-

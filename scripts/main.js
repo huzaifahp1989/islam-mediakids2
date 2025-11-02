@@ -112,9 +112,96 @@ function renderDailyContent() {
   const ayEl = document.getElementById('ayah');
   const hdEl = document.getElementById('hadith');
   const duEl = document.getElementById('dua');
-  if (ayEl) ayEl.innerHTML = `<strong>${ayah.ar}</strong><br/><em>${ayah.en}</em> — ${ayah.ref}`;
-  if (hdEl) hdEl.innerHTML = `${hadith.text} — ${hadith.ref}`;
+  if (ayEl) {
+    ayEl.innerHTML = `<strong>${ayah.ar}</strong><br/><em>${ayah.en}</em>`;
+    const refEl = document.getElementById('ayahRef');
+    if (refEl) refEl.textContent = ayah.ref || '';
+  }
+  if (hdEl) {
+    hdEl.innerHTML = `${hadith.text}`;
+    const refEl = document.getElementById('hadithRef');
+    if (refEl) refEl.textContent = hadith.ref || '';
+  }
   if (duEl) duEl.innerHTML = `<strong>${dua.ar}</strong><br/><em>${dua.en}</em> — ${dua.ref}`;
+  bindDailyActions({ ayah, hadith });
+}
+
+function parseQuranRef(ref) {
+  const m = /Quran\s+(\d+)\s*:\s*(\d+)/i.exec(ref || '');
+  if (!m) return null;
+  return { surah: parseInt(m[1], 10), ayah: parseInt(m[2], 10) };
+}
+
+async function fetchAyahAudioUrl(ref) {
+  const parsed = parseQuranRef(ref);
+  if (!parsed) return null;
+  const url = `https://api.alquran.cloud/v1/ayah/${parsed.surah}:${parsed.ayah}/ar.alafasy`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && data.data && data.data.audio) return data.data.audio;
+    return null;
+  } catch (e) {
+    console.warn('Ayah audio fetch failed', e);
+    return null;
+  }
+}
+
+function bindDailyActions({ ayah, hadith }) {
+  const playBtn = document.getElementById('playAyahBtn');
+  const copyAyahBtn = document.getElementById('copyAyahBtn');
+  const shareAyahBtn = document.getElementById('shareAyahBtn');
+  const copyHadithBtn = document.getElementById('copyHadithBtn');
+  const shareHadithBtn = document.getElementById('shareHadithBtn');
+  const ayAudio = document.getElementById('ayahAudio');
+  if (playBtn && ayAudio) {
+    playBtn.onclick = async () => {
+      playBtn.disabled = true; playBtn.textContent = 'Loading…';
+      const src = await fetchAyahAudioUrl(ayah.ref);
+      if (src) {
+        ayAudio.src = src;
+        try { await ayAudio.play(); playBtn.textContent = '⏸ Pause'; } catch {}
+        ayAudio.onplay = () => { playBtn.textContent = '⏸ Pause'; playBtn.disabled = false; };
+        ayAudio.onpause = () => { playBtn.textContent = '▶ Play Audio'; playBtn.disabled = false; };
+      } else {
+        playBtn.textContent = '▶ Play Audio'; playBtn.disabled = false;
+        alert('Audio not available for this ayah right now.');
+      }
+    };
+  }
+  if (copyAyahBtn) {
+    copyAyahBtn.onclick = async () => {
+      const text = `${ayah.ar}\n${ayah.en} — ${ayah.ref}`;
+      try { await navigator.clipboard.writeText(text); alert('Ayah copied'); } catch { alert('Copy failed'); }
+    };
+  }
+  if (shareAyahBtn) {
+    shareAyahBtn.onclick = async () => {
+      const text = `${ayah.ar}\n${ayah.en}`;
+      const title = `Ayah of the Day (${ayah.ref})`;
+      if (navigator.share) {
+        try { await navigator.share({ title, text }); } catch {}
+      } else {
+        try { await navigator.clipboard.writeText(`${title}\n${text}`); alert('Shared text copied'); } catch { alert('Share not supported'); }
+      }
+    };
+  }
+  if (copyHadithBtn) {
+    copyHadithBtn.onclick = async () => {
+      const text = `${hadith.text} — ${hadith.ref}`;
+      try { await navigator.clipboard.writeText(text); alert('Hadith copied'); } catch { alert('Copy failed'); }
+    };
+  }
+  if (shareHadithBtn) {
+    shareHadithBtn.onclick = async () => {
+      const title = `Hadith of the Day (${hadith.ref})`;
+      if (navigator.share) {
+        try { await navigator.share({ title, text: hadith.text }); } catch {}
+      } else {
+        try { await navigator.clipboard.writeText(`${title}\n${hadith.text}`); alert('Shared text copied'); } catch { alert('Share not supported'); }
+      }
+    };
+  }
 }
 
 // Radio player controls
@@ -127,6 +214,13 @@ function bindRadioPlayer() {
   const statusEl = document.getElementById('radioStatus');
   const visualizer = document.querySelector('#radio .rp-visualizer');
   if (!audio || !toggleBtn || !stopBtn || !muteBtn || !volumeInput || !statusEl) return;
+
+  const ensureSrc = () => {
+    if (!audio.src) {
+      const src = audio.getAttribute('data-src') || (audio.dataset ? audio.dataset.src : '') || '';
+      if (src) { audio.src = src; audio.load(); }
+    }
+  };
 
   const updateUi = (overrideStatus) => {
     const isPlaying = !audio.paused && !audio.ended && audio.readyState >= 2;
@@ -148,10 +242,23 @@ function bindRadioPlayer() {
     // Guard against play() being aborted by a quick pause() or source change
     let playPromise;
     try {
+      toggleBtn.disabled = true;
       if (audio.paused) {
+        ensureSrc();
         updateUi('Buffering…');
         playPromise = audio.play();
-        await playPromise;
+        try { await playPromise; } catch (err) {
+          if (err && err.name === 'AbortError') {
+            console.debug('Radio play aborted (pause or source change).');
+            updateUi('Paused');
+          } else if (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) {
+            console.warn('Playback requires user interaction or is blocked:', err);
+            statusEl.textContent = 'Playback requires interaction';
+          } else {
+            console.error('Radio play error:', err);
+            statusEl.textContent = 'Playback failed';
+          }
+        }
       } else {
         audio.pause();
       }
@@ -170,6 +277,7 @@ function bindRadioPlayer() {
         statusEl.textContent = 'Playback failed';
       }
     } finally {
+      toggleBtn.disabled = false;
       // Only update if no pending play promise or after it settles
       updateUi();
     }
@@ -179,6 +287,8 @@ function bindRadioPlayer() {
     try {
       audio.pause();
       audio.currentTime = 0;
+      // Clear the src to gracefully abort any ongoing network request
+      try { audio.src = ''; audio.load(); } catch {}
       updateUi('Stopped');
     } finally {
       updateUi();
@@ -273,19 +383,6 @@ function bindAuthForm() {
       const fd = new FormData(loginForm);
       try {
         const user = login({ username: fd.get('username'), password: fd.get('password') });
-        // Optionally update profile info provided during login
-        const madrasah = (fd.get('madrasah') || '').trim();
-        const ageRaw = (fd.get('age') || '').trim();
-        const age = ageRaw ? parseInt(ageRaw, 10) : undefined;
-        if (madrasah || (age !== undefined && !Number.isNaN(age))) {
-          const users = getUsers();
-          const idx = users.findIndex(u => u.id === user.id);
-          if (idx !== -1) {
-            if (madrasah) users[idx].madrasah = madrasah;
-            if (age !== undefined && !Number.isNaN(age)) users[idx].age = age;
-            saveUsers(users);
-          }
-        }
         alert(`Welcome back, ${user.username}!`);
         window.location.href = 'games.html';
       } catch (err) { alert(err.message || String(err)); }
@@ -315,7 +412,7 @@ function bindQuiz() {
   if (quizNotice) {
     if (!you) quizNotice.textContent = 'Please log in or sign up to play and earn points.';
     else if (!canPlayDailyQuiz()) quizNotice.textContent = 'You already played today. Come back tomorrow!';
-    else quizNotice.textContent = 'Earn points with today\'s quiz!';
+    else quizNotice.textContent = 'Earn 1 point with today\'s quiz!';
   }
   if (quizForm) {
     quizForm.addEventListener('submit', (e) => {
@@ -326,7 +423,7 @@ function bindQuiz() {
       const answers = ['b','a','c','b','a'];
       let score = 0;
       answers.forEach((ans, i) => { if ((fd.get(`q${i+1}`) || '') === ans) score++; });
-      const pts = score * 10 + (score === answers.length ? 10 : 0); // 10 pts per correct, +10 perfect
+      const pts = 1;
       addPoints(you.id, pts, 'daily-quiz');
       markPlayedDailyQuiz();
       alert(`You scored ${score}/${answers.length}. Points earned: ${pts}`);
@@ -335,14 +432,263 @@ function bindQuiz() {
   }
 }
 
+function bindIslamicQuiz() {
+  const app = document.getElementById('quizApp');
+  if (!app) return; // only on islamic-quiz.html
+  const you = currentUser();
+  const setupMsg = document.getElementById('quizSetupMsg');
+  if (setupMsg) {
+    setupMsg.textContent = you ? 'Ready to earn points!' : 'Please log in or sign up to earn points.';
+  }
+
+  const QUIZ_BANK = {
+    seerah: {
+      easy: [
+        { q: 'What is the name of the final Prophet?', a:'Prophet Muhammad (ﷺ)', b:'Prophet Musa (AS)', c:'Prophet Isa (AS)', correct:'a' },
+        { q: 'Where was the Prophet (ﷺ) born?', a:'Makkah', b:'Madinah', c:'Taif', correct:'a' },
+        { q: 'What is the Hijrah?', a:'Journey to Madinah', b:'Battle of Badr', c:'Farewell Sermon', correct:'a' },
+        { q: 'Which tribe did the Prophet (ﷺ) belong to?', a:'Quraysh', b:'Aws', c:'Khazraj', correct:'a' },
+        { q: 'The first revelation came in which month?', a:'Ramadan', b:'Muharram', c:'Dhul-Hijjah', correct:'a' }
+      ],
+      medium: [
+        { q: 'Who raised the Prophet (ﷺ) after his mother passed away?', a:'Abu Talib', b:'Abdul Muttalib', c:'Abu Bakr', correct:'b' },
+        { q: 'What is the first revelation chapter?', a:'Al-Fatiha', b:'Al-Alaq', c:'Al-Ikhlas', correct:'b' },
+        { q: 'Which cave received the first revelation?', a:'Cave Hira', b:'Cave Thawr', c:'Cave Ashaab', correct:'a' },
+        { q: 'The Hijrah occurred in which year?', a:'622 CE', b:'610 CE', c:'632 CE', correct:'a' },
+        { q: 'Who was the first wife of the Prophet (ﷺ)?', a:'Khadijah (RA)', b:'Aisha (RA)', c:'Hafsa (RA)', correct:'a' }
+      ],
+      hard: [
+        { q: 'Who was the wet nurse of the Prophet (ﷺ)?', a:'Halima Saadia', b:'Khadijah', c:'Amina', correct:'a' },
+        { q: 'Year of the Elephant is approximately?', a:'570 CE', b:'610 CE', c:'632 CE', correct:'a' },
+        { q: 'Which treaty occurred in 6 AH?', a:'Hudaybiyyah', b:'Taif', c:'Uhud', correct:'a' },
+        { q: 'Who accompanied the Prophet (ﷺ) in the Hijrah?', a:'Abu Bakr (RA)', b:'Umar (RA)', c:'Ali (RA)', correct:'a' },
+        { q: 'Which battle was in 2 AH?', a:'Badr', b:'Uhud', c:'Khandaq', correct:'a' }
+      ]
+    },
+    hadith: {
+      easy: [
+        { q: 'Hadith are the sayings of?', a:'Prophet Muhammad (ﷺ)', b:'Sahabah', c:'Scholars', correct:'a' },
+        { q: 'Which collection is famous?', a:'Bukhari', b:'Sunan Abu Dawud', c:'Tafsir ibn Kathir', correct:'a' },
+        { q: 'Smiling is considered?', a:'Charity', b:'Sunnah prayer', c:'Fard', correct:'a' },
+        { q: 'Greeting with Salam is:', a:'Sunnah', b:'Makruh', c:'Haram', correct:'a' },
+        { q: 'Truthfulness is:', a:'Praised', b:'Disliked', c:'Neutral', correct:'a' }
+      ],
+      medium: [
+        { q: 'The best among you are those who learn and teach?', a:'Hadith', b:'Quran', c:'Fiqh', correct:'b' },
+        { q: 'Gentleness is loved by?', a:'Allah', b:'People', c:'Leaders', correct:'a' },
+        { q: 'Strong believer is better than?', a:'Weak believer', b:'Non-believer', c:'Hypocrite', correct:'a' },
+        { q: 'Backbiting is:', a:'Haram', b:'Mustahab', c:'Mubah', correct:'a' },
+        { q: 'Keeping promises is:', a:'Part of good character', b:'Makruh', c:'Mubah', correct:'a' }
+      ],
+      hard: [
+        { q: 'Which scholar authored Sahih Muslim?', a:'Imam Muslim', b:'Imam Nawawi', c:'Imam Malik', correct:'a' },
+        { q: 'Hadith grading includes:', a:'Sahih/Daif', b:'Haq/Van', c:'Halal/Haram', correct:'a' },
+        { q: 'Narrations are transmitted via:', a:'Isnad', b:'Ijazah', c:'Madhhab', correct:'a' },
+        { q: 'Sahih Bukhari compiler:', a:'Imam al-Bukhari', b:'Imam Ahmad', c:'Imam Abu Hanifa', correct:'a' },
+        { q: 'Number of Hadith in Arbaeen Nawawi:', a:'40', b:'50', c:'30', correct:'a' }
+      ]
+    },
+    fiqh: {
+      easy: [
+        { q: 'How many daily prayers?', a:'5', b:'3', c:'7', correct:'a' },
+        { q: 'Zakat is:', a:'Charity', b:'Tax', c:'Loan', correct:'a' },
+        { q: 'Wudu is:', a:'Ablution', b:'Fasting', c:'Pilgrimage', correct:'a' },
+        { q: 'Qiblah is towards:', a:'Kaaba', b:'Jerusalem', c:'Madinah', correct:'a' },
+        { q: 'Tayammum uses:', a:'Clean earth', b:'Perfume', c:'Oil', correct:'a' }
+      ],
+      medium: [
+        { q: 'Sawm refers to:', a:'Fasting', b:'Prayer', c:'Charity', correct:'a' },
+        { q: 'Shortening prayer when travelling is:', a:'Permissible', b:'Forbidden', c:'Mandatory', correct:'a' },
+        { q: 'Major ablution is called:', a:'Ghusl', b:'Wudu', c:'Tawaf', correct:'a' },
+        { q: 'Witr prayer is offered:', a:'Odd units', b:'Even units', c:'Long units', correct:'a' },
+        { q: 'Conditions of Salah include:', a:'Purity', b:'Noise', c:'Speed', correct:'a' }
+      ],
+      hard: [
+        { q: 'Rukn of Salah includes:', a:'Sujood', b:'Taslim', c:'Dua', correct:'a' },
+        { q: 'Madhahib include:', a:'Hanafi', b:'Ashari', c:'Mu’tazili', correct:'a' },
+        { q: 'Zakat due is typically:', a:'2.5% of eligible wealth', b:'10%', c:'1%', correct:'a' },
+        { q: 'Minimum nisab relates to:', a:'Threshold for Zakat', b:'Prayer time', c:'Fasting length', correct:'a' },
+        { q: 'Sujood ash-shukr is:', a:'Prostration of gratitude', b:'Friday prostration', c:'Funeral prostration', correct:'a' }
+      ]
+    },
+    akhlaq: {
+      easy: [
+        { q: 'Truthfulness is a:', a:'Good character', b:'Fiqh rule', c:'Story', correct:'a' },
+        { q: 'Helping others is:', a:'Rewarded', b:'Forbidden', c:'Makruh', correct:'a' },
+        { q: 'Respecting parents is:', a:'Obligatory', b:'Optional', c:'Disliked', correct:'a' },
+        { q: 'Generosity is:', a:'Praised', b:'Neutral', c:'Blameworthy', correct:'a' },
+        { q: 'Arrogance is:', a:'Blameworthy', b:'Praised', c:'Neutral', correct:'a' }
+      ],
+      medium: [
+        { q: 'Backbiting is:', a:'Haram', b:'Mustahab', c:'Mubah', correct:'a' },
+        { q: 'Keeping promises is:', a:'Sunnah of good character', b:'Makruh', c:'Mubah', correct:'a' },
+        { q: 'Patience is:', a:'Beloved to Allah', b:'Disliked', c:'Forbidden', correct:'a' },
+        { q: 'Humility is:', a:'Praised', b:'Blameworthy', c:'Neutral', correct:'a' },
+        { q: 'Kind speech is:', a:'Rewarded', b:'Forbidden', c:'Makruh', correct:'a' }
+      ],
+      hard: [
+        { q: 'Ihsan means:', a:'Excellence', b:'Charity', c:'Prayer', correct:'a' },
+        { q: 'Forgiving others is:', a:'Rewarded', b:'Punished', c:'Neutral', correct:'a' },
+        { q: 'Good neighborliness is:', a:'Praised', b:'Forbidden', c:'Neutral', correct:'a' },
+        { q: 'Gratitude is expressed by:', a:'Alhamdulillah', b:'SubhanAllah', c:'Allahu Akbar', correct:'a' },
+        { q: 'Trustworthiness is:', a:'Praised', b:'Disliked', c:'Neutral', correct:'a' }
+      ]
+    },
+    adaab: {
+      easy: [
+        { q: 'Saying Bismillah before eating is:', a:'Sunnah', b:'Fard', c:'Makruh', correct:'a' },
+        { q: 'Sneezing response:', a:'Yarhamuk Allah', b:'Jazak Allah', c:'Subhan Allah', correct:'a' },
+        { q: 'Enter with left or right foot?', a:'Right foot for mosque', b:'Left foot for mosque', c:'Any', correct:'a' },
+        { q: 'Eat with:', a:'Right hand', b:'Left hand', c:'Either', correct:'a' },
+        { q: 'Knock before entering:', a:'Yes', b:'No', c:'Only at night', correct:'a' }
+      ],
+      medium: [
+        { q: 'Etiquettes of speech include:', a:'Truthfulness', b:'Loudness', c:'Interrupting', correct:'a' },
+        { q: 'Visiting the sick is:', a:'Recommended', b:'Forbidden', c:'Neutral', correct:'a' },
+        { q: 'Respect for elders is:', a:'Islamic etiquette', b:'Optional', c:'Disliked', correct:'a' },
+        { q: 'Covering mouth when yawning is:', a:'Recommended', b:'Forbidden', c:'Mandatory', correct:'a' },
+        { q: 'Saying Salam first is:', a:'Sunnah', b:'Makruh', c:'Haram', correct:'a' }
+      ],
+      hard: [
+        { q: 'Etiquettes of gatherings include:', a:'Not interrupting', b:'Speaking loudly', c:'Mocking others', correct:'a' },
+        { q: 'Lowering the gaze is:', a:'Recommended and rewarding', b:'Forbidden', c:'Mandatory every second', correct:'a' },
+        { q: 'Visiting relatives is:', a:'Recommended', b:'Disliked', c:'Neutral', correct:'a' },
+        { q: 'Giving salam to children is:', a:'Sunnah', b:'Makruh', c:'Haram', correct:'a' },
+        { q: 'Bismillah before tasks is:', a:'Recommended', b:'Forbidden', c:'Mandatory', correct:'a' }
+      ]
+    },
+    duas: {
+      easy: [
+        { q: 'Before starting a task say:', a:'Bismillah', b:'Alhamdulillah', c:'Allahu Akbar', correct:'a' },
+        { q: 'After eating say:', a:'Alhamdulillah', b:'SubhanAllah', c:'Astaghfirullah', correct:'a' },
+        { q: 'When seeking forgiveness:', a:'Astaghfirullah', b:'Bismillah', c:'Ameen', correct:'a' },
+        { q: 'Dua for knowledge:', a:'Rabbi zidni ilma', b:'Rabbana atina', c:'Rabbi hab li', correct:'a' },
+        { q: 'Dua for guidance:', a:'Ihdinas siratal mustaqeem', b:'La ilaha illallah', c:'Allahu Akbar', correct:'a' }
+      ],
+      medium: [
+        { q: 'Dua before sleep includes:', a:'Bismika Allahumma amutu wa ahya', b:'Allahu Akbar', c:'La hawla', correct:'a' },
+        { q: 'Dua of Yunus (AS):', a:'La ilaha illa anta subhanaka inni kuntu minaz zalimeen', b:'Rabbana zalamna', c:'Rabbighfir li', correct:'a' },
+        { q: 'Dua of Musa (AS):', a:'Rabbishrah li sadri', b:'Rabbi zidni ilma', c:'Rabbana atina', correct:'a' },
+        { q: 'Dua for parents:', a:'Rabbir hamhuma kama rabbayani saghira', b:'Rabbana atina', c:'Rabbi hab li', correct:'a' },
+        { q: 'Dua when entering home:', a:'Bismillah and Salam', b:'SubhanAllah', c:'Takbeer', correct:'a' }
+      ],
+      hard: [
+        { q: 'Dua in sujood often includes:', a:'Subhana Rabbiyal A’la', b:'Subhana Rabbiyal Azeem', c:'Alhamdulillah', correct:'a' },
+        { q: 'Dua for steadfastness:', a:'Thabbit qulubana', b:'Rabbi zidni', c:'Allahu Akbar', correct:'a' },
+        { q: 'Dua for entering mosque:', a:'Allahumma iftah li abwaba rahmatik', b:'Allahumma barik lana', c:'Allahumma aghnina', correct:'a' },
+        { q: 'Dua when distressed:', a:'La hawla wa la quwwata illa billah', b:'Bismillah', c:'SubhanAllah', correct:'a' },
+        { q: 'Dua after Adhan includes:', a:'Allahumma Rabba hadhihid-da’watit-taammah...', b:'Rabbana atina', c:'Rabbi zidni', correct:'a' }
+      ]
+    }
+  };
+
+  const topicEl = document.getElementById('quizTopic');
+  const diffEl = document.getElementById('quizDifficulty');
+  const startBtn = document.getElementById('quizStartBtn');
+  const setup = document.getElementById('quizSetup');
+  const play = document.getElementById('quizPlay');
+  const result = document.getElementById('quizResult');
+  const qTitle = document.getElementById('quizTitle');
+  const qLevel = document.getElementById('quizLevel');
+  const qIndex = document.getElementById('quizIndex');
+  const qTotal = document.getElementById('quizTotal');
+  const qContainer = document.getElementById('quizQuestion');
+  const submitBtn = document.getElementById('quizSubmitBtn');
+  const nextBtn = document.getElementById('quizNextBtn');
+  const feedback = document.getElementById('quizFeedback');
+  const scoreEl = document.getElementById('quizScore');
+  const outOfEl = document.getElementById('quizOutOf');
+  const pointsEl = document.getElementById('quizPoints');
+  const restartBtn = document.getElementById('quizRestartBtn');
+
+  let questions = [];
+  let idx = 0;
+  let score = 0;
+
+  function renderQuestion() {
+    const q = questions[idx];
+    qIndex.textContent = String(idx + 1);
+    qTotal.textContent = String(questions.length);
+    feedback.textContent = '';
+    nextBtn.classList.add('hidden');
+    submitBtn.disabled = false;
+    const opts = [ ['a', q.a], ['b', q.b], ['c', q.c] ];
+    if (q.d) opts.push(['d', q.d]);
+    qContainer.innerHTML = `
+      <div>
+        <label><strong>${q.q}</strong></label>
+        <div>
+          ${opts.map(([key, val]) => `
+            <label style="display:block;margin:6px 0;">
+              <input type="radio" name="quizAnswer" value="${key}"> ${val}
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  startBtn.addEventListener('click', () => {
+    const topic = topicEl.value;
+    const diff = diffEl.value;
+    const youNow = currentUser();
+    if (!youNow) {
+      alert('Please log in to earn points.');
+      return;
+    }
+    const bank = QUIZ_BANK[topic]?.[diff] || [];
+    questions = bank.slice(0, 5);
+    if (questions.length === 0) { alert('No questions available for this selection yet.'); return; }
+    idx = 0; score = 0;
+    qTitle.textContent = topic.charAt(0).toUpperCase() + topic.slice(1);
+    qLevel.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
+    setup.classList.add('hidden');
+    result.classList.add('hidden');
+    play.classList.remove('hidden');
+    renderQuestion();
+  });
+
+  submitBtn.addEventListener('click', () => {
+    const sel = document.querySelector('input[name="quizAnswer"]:checked');
+    if (!sel) { alert('Please choose an answer.'); return; }
+    const chosen = sel.value;
+    const correct = questions[idx].correct;
+    const ok = chosen === correct;
+    score += ok ? 1 : 0;
+    feedback.textContent = ok ? '✅ Correct!' : '❌ Not quite, keep going!';
+    submitBtn.disabled = true;
+    nextBtn.classList.remove('hidden');
+  });
+
+  nextBtn.addEventListener('click', () => {
+    idx++;
+    if (idx >= questions.length) {
+      const youNow = currentUser();
+      const pts = 1;
+      if (youNow) addPoints(youNow.id, pts, 'islamic-quiz');
+      scoreEl.textContent = String(score);
+      outOfEl.textContent = String(questions.length);
+      pointsEl.textContent = String(pts);
+      play.classList.add('hidden');
+      result.classList.remove('hidden');
+    } else {
+      renderQuestion();
+    }
+  });
+
+  restartBtn.addEventListener('click', () => {
+    result.classList.add('hidden');
+    setup.classList.remove('hidden');
+  });
+}
+
 // Stories helpers
 function bindStoryReadButtons() {
+  // Points removed for stories: this hook is now a no-op
+  // If any legacy elements remain, show a friendly message without points.
   document.querySelectorAll('[data-award-story]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const you = currentUser();
-      if (!you) { alert('Log in to track points.'); return; }
-      addPoints(you.id, 5, 'story-read');
-      alert('Great job! +5 points awarded for reading.');
+      alert('Enjoy reading! Points are not awarded for stories.');
     });
   });
 }
@@ -426,13 +772,18 @@ function renderHomeSlider() {
   const nextBtn = document.getElementById('sliderNext');
   if (!slidesEl || !dotsEl) return;
 
-  // Use local SVG assets (CORS-safe and fast)
+  // Use local SVG assets (CORS-safe and fast) — feature-focused slides
   const SLIDES = [
-    { quote: 'My Lord, increase me in knowledge.', ref: 'Quran 20:114', img: 'assets/slider/mosque-1.svg' },
-    { quote: 'Indeed, with hardship comes ease.', ref: 'Quran 94:6', img: 'assets/slider/pattern-star.svg' },
-    { quote: 'The best among you are those who learn the Quran and teach it.', ref: 'Bukhari', img: 'assets/slider/quran.svg' },
-    { quote: 'Allah is gentle and loves gentleness in all matters.', ref: 'Bukhari', img: 'assets/slider/mosque-2.svg' },
-    { quote: 'So remember Me; I will remember you.', ref: 'Quran 2:152', img: 'assets/slider/pattern-grid.svg' },
+    // Makkah — Kaaba
+    { title: 'Quran with Translation', desc: 'Read and listen verse-by-verse in multiple languages.', href: 'quran.html', cta: 'Explore Now', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Kaaba%204.JPG' },
+    // Madinah — Green Dome
+    { title: 'Complete Hadith Books', desc: 'Authentic collections with easy navigation.', href: 'learn.html', cta: 'Learn More', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/The%20Green%20Dome,%20Masjid%20Nabawi,%20Madina.jpg' },
+    // Nature — Sahara Desert dunes
+    { title: 'Podcasts & Nasheeds', desc: 'Inspiring audio content for all ages.', href: 'stories.html', cta: 'Listen', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Algeria%20Sahara%20Desert%20Photo%20From%20Drone%205.jpg' },
+    // Kids — keep nature theme with desert dunes (reused) or swap to local pattern as fallback
+    { title: 'Kids Zone', desc: 'Games, quizzes, and learning challenges.', href: 'games.html', cta: 'Play Now', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Western%20Sahara%20desert%201.jpg' },
+    // Blog — Makkah at night or keep pattern; using Kaaba category image as thematic
+    { title: 'Islamic Blog & Articles', desc: 'Latest posts from IMediaC.com.', href: '#latestArticles', cta: 'Read More', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mecca%202012.jpg' },
   ];
 
   slidesEl.innerHTML = '';
@@ -441,7 +792,9 @@ function renderHomeSlider() {
     const slide = document.createElement('div');
     slide.className = 'slide';
     slide.style.backgroundImage = `url(${s.img})`;
-    slide.innerHTML = `<div class="slide-content"><h3>“${s.quote}”</h3><p>— ${s.ref}</p></div>`;
+    slide.innerHTML = s.quote
+      ? `<div class="slide-content"><h3>“${s.quote}”</h3><p>— ${s.ref}</p></div>`
+      : `<div class="slide-content"><h3>${s.title}</h3><p>${s.desc}</p><a class="btn btn-secondary" href="${s.href}">${s.cta || 'Explore Now'}</a></div>`;
     slidesEl.appendChild(slide);
     const dot = document.createElement('button');
     dot.className = 'slider-dot';
@@ -474,6 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Enable basic hooks depending on page elements present
   bindAuthForm();
   bindQuiz();
+  bindIslamicQuiz();
   bindStoryReadButtons();
   renderLeaderboard();
   bindContactForm();
@@ -482,6 +836,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHomeSlider();
   bindRadioPlayer();
   bindQuranPage();
+  initPrayerTimes();
+  bindMiniPlayer();
+  initToggles();
+  initNewsletterModal();
+  initScrollTop();
 });
 
 // Mobile menu toggle
@@ -521,6 +880,140 @@ function enableMobileMenu() {
       btn.setAttribute('aria-expanded', 'false');
     }
   });
+}
+
+// Prayer times via Aladhan API
+async function initPrayerTimes() {
+  const grid = document.getElementById('prayerGrid');
+  const status = document.getElementById('prayerStatus');
+  const nextNameEl = document.getElementById('nextPrayerName');
+  const nextCountdownEl = document.getElementById('nextPrayerCountdown');
+  const monthlyLink = document.getElementById('prayerMonthlyLink');
+  const refreshBtn = document.getElementById('prayerRefresh');
+  if (!grid || !status) return;
+  let timings = null; let tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; let loc = { lat: 51.5074, lon: -0.1278 };
+  function renderTimings() {
+    if (!timings) return;
+    const names = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+    grid.innerHTML = names.map(n => {
+      const t = timings[n];
+      return `<div class="prayer-item"><div class="prayer-name">${n}</div><div class="prayer-time">${t}</div></div>`;
+    }).join('');
+    status.textContent = `Times for your location (${tz})`;
+    if (monthlyLink) monthlyLink.href = `https://api.aladhan.com/v1/calendar?latitude=${loc.lat}&longitude=${loc.lon}&method=2`;
+    updateNextCountdown();
+  }
+  function parseTimeToDate(t) {
+    const [h,m] = String(t).split(':').map(x=>parseInt(x,10));
+    const d = new Date(); d.setHours(h||0,m||0,0,0); return d;
+  }
+  function updateNextCountdown() {
+    if (!timings || !nextNameEl || !nextCountdownEl) return;
+    const now = new Date();
+    const order = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+    let nextName = null; let nextTime = null;
+    for (const n of order) {
+      const tStr = timings[n]; const tDate = parseTimeToDate(tStr);
+      if (tDate > now) { nextName = n; nextTime = tDate; break; }
+    }
+    if (!nextName) { nextName = 'Fajr'; const tDate = parseTimeToDate(timings['Fajr']); tDate.setDate(tDate.getDate()+1); nextTime = tDate; }
+    nextNameEl.textContent = nextName;
+    const diff = Math.max(0, nextTime - now);
+    const hh = String(Math.floor(diff/3600000)).padStart(2,'0');
+    const mm = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    const ss = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    nextCountdownEl.textContent = `${hh}:${mm}:${ss}`;
+  }
+  let countdownTimer = null; function startCountdown(){ if (countdownTimer) clearInterval(countdownTimer); countdownTimer = setInterval(updateNextCountdown, 1000); }
+  async function fetchTimings() {
+    status.textContent = 'Fetching prayer times…';
+    try {
+      const url = `https://api.aladhan.com/v1/timings?latitude=${loc.lat}&longitude=${loc.lon}&method=2`;
+      const res = await fetch(url);
+      const data = await res.json();
+      timings = data && data.data && data.data.timings ? data.data.timings : null;
+      tz = (data && data.data && data.data.meta && data.data.meta.timezone) || tz;
+      renderTimings(); startCountdown();
+    } catch (e) { console.error('Prayer times error', e); status.textContent = 'Failed to load prayer times'; }
+  }
+  function geolocate(){ if (!navigator.geolocation) { fetchTimings(); return; }
+    navigator.geolocation.getCurrentPosition(pos => { loc = { lat: pos.coords.latitude, lon: pos.coords.longitude }; fetchTimings(); }, err => { console.warn('Geolocation failed', err); fetchTimings(); }, { timeout: 8000 }); }
+  refreshBtn && refreshBtn.addEventListener('click', fetchTimings);
+  geolocate();
+}
+
+// Floating mini player (reuses #radioPlayer)
+function bindMiniPlayer(){
+  const mini = document.getElementById('miniPlayer');
+  const playBtn = document.getElementById('miniPlayBtn');
+  const closeBtn = document.getElementById('miniCloseBtn');
+  const audio = document.getElementById('radioPlayer');
+  if (!mini || !playBtn || !closeBtn || !audio) return;
+  mini.style.display = 'flex';
+  function update(){ const playing = !audio.paused && !audio.ended; playBtn.textContent = playing ? '⏸' : '▶'; }
+  playBtn.addEventListener('click', async ()=>{
+    try {
+      playBtn.disabled = true;
+      if (audio.paused) {
+        if (!audio.src) { const src = audio.getAttribute('data-src') || (audio.dataset ? audio.dataset.src : '') || ''; if (src) { audio.src = src; audio.load(); } }
+        try { await audio.play(); } catch (err) {
+          if (err && err.name === 'AbortError') {
+            console.debug('Mini player play aborted');
+          } else if (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) {
+            console.warn('Playback requires interaction or is blocked');
+          } else {
+            console.error('Mini player play error:', err);
+          }
+        }
+      } else {
+        audio.pause();
+      }
+    } finally {
+      playBtn.disabled = false;
+      update();
+    }
+  });
+  closeBtn.addEventListener('click', ()=>{ mini.style.display='none'; });
+  audio.addEventListener('play', update); audio.addEventListener('pause', update); audio.addEventListener('ended', update);
+  update();
+}
+
+// Language/Theme toggles
+function initToggles(){
+  const langBtn = document.getElementById('langToggle');
+  const themeBtn = document.getElementById('themeToggle');
+  langBtn && langBtn.addEventListener('click', ()=>{ document.body.classList.toggle('lang-ur'); });
+  themeBtn && themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('theme-dark'); });
+}
+
+// Newsletter modal
+function initNewsletterModal(){
+  const modal = document.getElementById('newsletterModal');
+  const backdrop = document.getElementById('newsletterBackdrop');
+  const closeBtn = document.getElementById('newsletterClose');
+  const form = document.getElementById('newsletterForm');
+  const email = document.getElementById('newsletterEmail');
+  const msg = document.getElementById('newsletterMsg');
+  if (!modal || !backdrop || !closeBtn || !form || !email) return;
+  const SEEN_KEY = 'IMK_NEWSLETTER_SEEN';
+  const seen = localStorage.getItem(SEEN_KEY);
+  function open(){ modal.style.display='block'; modal.setAttribute('aria-hidden','false'); }
+  function close(){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); }
+  if (!seen) { setTimeout(open, 12000); }
+  backdrop.addEventListener('click', close); closeBtn.addEventListener('click', close);
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault(); const val = String(email.value||'').trim();
+    const ok = /.+@.+\..+/.test(val);
+    if (!ok) { msg.textContent = 'Please enter a valid email.'; return; }
+    msg.textContent = 'Thank you! We will keep you updated.'; localStorage.setItem(SEEN_KEY,'1'); setTimeout(close, 1500);
+  });
+}
+
+// Scroll-to-top button
+function initScrollTop(){
+  const btn = document.getElementById('scrollTopBtn'); if (!btn) return;
+  window.addEventListener('scroll', ()=>{ const show = window.scrollY > 300; btn.classList.toggle('show', show); });
+  btn.addEventListener('click', ()=>{ window.scrollTo({ top:0, behavior:'smooth' }); });
 }
 
 // Quran page: load surahs, render ayahs, and play verse-by-verse audio

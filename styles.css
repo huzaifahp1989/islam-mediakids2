@@ -1,31 +1,34 @@
-/* IMediaC Kids Theme: light-blue and yellow, clouds and stars */
+/* Global Theme: modern teal & amber, clean and professional */
 :root {
-  --blue-100: #e6f6ff;
-  --blue-300: #a8e3ff;
-  --blue-500: #5bc2f7;
-  --yellow-300: #ffe27a;
-  --yellow-500: #ffd44d;
-  --text: #10324a;
-  --card-bg: #ffffffcc;
-  --shadow: 0 8px 20px rgba(16, 50, 74, 0.15);
+  --blue-100: #f7f8fb;   /* soft page background */
+  --blue-300: #e6eaf5;   /* subtle hover/background */
+  --blue-500: #0ea5a4;   /* primary (teal) */
+  --yellow-300: #fde68a; /* soft accent */
+  --yellow-500: #f59e0b; /* amber accent */
+  --text: #1f2937;       /* neutral dark text */
+  --card-bg: #ffffffcc;  /* translucent card bg for hero/cta */
+  --shadow: 0 10px 24px rgba(31, 41, 55, 0.12);
 }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; }
-body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; color: var(--text); background: var(--blue-100); }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial, sans-serif; color: var(--text); background: var(--blue-100); line-height: 1.6; }
+html { scroll-behavior: smooth; }
 
 /* Cartoon clouds + stars background */
 .theme-clouds {
-  background:
-    radial-gradient(circle at 12% 10%, rgba(255, 212, 77, .8) 0 6px, transparent 7px),
-    radial-gradient(circle at 78% 22%, rgba(255, 212, 77, .7) 0 5px, transparent 6px),
-    radial-gradient(circle at 42% 30%, rgba(255, 212, 77, .7) 0 4px, transparent 5px),
-    linear-gradient(180deg, var(--blue-300), var(--blue-100));
+  /* Subtle gradient background to keep things clean */
+  background: linear-gradient(180deg, var(--blue-300), var(--blue-100));
 }
 
 .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 16px; }
 
 .site-header { position: sticky; top: 0; z-index: 10; background: #fff; box-shadow: var(--shadow); }
+.announcement-bar { background: linear-gradient(90deg, #5ea0ff, #9bd3ff); color: #fff; overflow: hidden; }
+.announcement-track { display: inline-block; white-space: nowrap; padding: 6px 0; animation: marquee 38s linear infinite; font-weight: 600; text-shadow: 0 1px 8px rgba(0,0,0,.2); }
+.announcement-bar:hover .announcement-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .announcement-track { animation: none; } }
+@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
 
 .logo-title { display: flex; align-items: center; gap: 10px; }
@@ -40,7 +43,7 @@ body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; color: var(--text
 .nav-link.active { background: var(--yellow-300); }
 
 .btn { display: inline-block; padding: 10px 16px; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow); }
-.btn-primary { background: var(--yellow-500); color: #2b2b2b; }
+.btn-primary { background: var(--yellow-500); color: #1f2937; }
 .btn-secondary { background: var(--blue-500); color: #fff; }
 .btn-outline { border: 2px solid var(--blue-500); color: var(--text); background: #fff; }
 .btn + .btn { margin-left: 10px; }
@@ -95,6 +98,17 @@ tr:hover td { background: #fafafa; }
 .slider-dots { position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: center; gap: 6px; }
 .slider-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.7); border: 1px solid rgba(0,0,0,.15); }
 .slider-dot.active { background: var(--yellow-500); }
+
+/* Full-bleed hero slider variant */
+.hero-slider.full-bleed { width: 100%; margin: 0; }
+.hero-slider.full-bleed .slider { border-radius: 0; }
+.hero-slider.full-bleed .slide::before { border-radius: 0; }
+.hero-slider.full-bleed .slides { height: 420px; }
+@media (max-width: 720px) { .hero-slider.full-bleed .slides { height: 280px; } }
+
+/* Enhanced hero slider background for better readability and aesthetics */
+.hero-slider.full-bleed .slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.65)); }
+.hero-slider.full-bleed .slide::after { content: ''; position: absolute; inset: 0; background-image: url('assets/slider/pattern-grid.svg'); background-size: cover; background-position: center; opacity: .14; mix-blend-mode: soft-light; pointer-events: none; }
 
 /* Radio Player */
 .radio-player { display: grid; gap: 12px; }
@@ -158,7 +172,7 @@ tr:hover td { background: #fafafa; }
   .leaderboard-table tbody td { display: flex !important; justify-content: space-between; align-items: center; padding: 6px 0; border: none; }
   .leaderboard-table tbody td::before { content: attr(data-label); font-weight: 600; color: #555; }
   .leaderboard-table tbody td.col-name { font-weight: 700; }
-  .leaderboard-table tbody td.col-points { color: #0b5ed7; font-weight: 700; }
+  .leaderboard-table tbody td.col-points { color: var(--blue-500); font-weight: 700; }
   /* Ensure previously hidden columns reappear in card layout */
   .leaderboard-table tbody td.col-madrasah,
   .leaderboard-table tbody td.col-age { display: flex !important; }
@@ -174,7 +188,7 @@ tr:hover td { background: #fafafa; }
 .ayah-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .ayah-item { padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; }
 .ayah-row { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px; }
-.ayah-no { font-weight: 700; color: #0b5ed7; }
+.ayah-no { font-weight: 700; color: var(--blue-500); }
 .ayah-text { font-size: 1.05rem; }
 .ayah-item.playing { border-color: var(--yellow-500); box-shadow: 0 0 0 3px rgba(255, 212, 77, .35); }
 .ayah-translation { margin-top: 6px; color: #4b5563; font-size: .98rem; }
@@ -190,3 +204,105 @@ tr:hover td { background: #fafafa; }
   /* Reduce footer text size a touch */
   .site-footer p { font-size: .9rem; }
 }
+
+/* Home enhancements (IMediaC Kids Zone-style) */
+.section-title { text-align: center; margin: 26px 0 8px; }
+
+
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin: 16px 0; }
+.stat { background: #fff; border-radius: 14px; padding: 14px; text-align: center; box-shadow: var(--shadow); }
+.stat .num { font-size: 1.6rem; font-weight: 800; color: var(--blue-500); }
+.stat .label { margin-top: 6px; font-size: .95rem; opacity: .8; }
+
+.values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.value-card { text-align: center; }
+.value-card .icon { font-size: 2rem; }
+
+.learn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+
+/* Blog articles */
+.articles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.article-card { background: #fff; border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; text-decoration: none; color: var(--text); display: grid; grid-template-rows: 160px auto; }
+.article-image { width: 100%; height: 160px; background-size: cover; background-position: center; }
+.article-content { padding: 14px 16px; }
+.article-card h3 { margin-top: 0; }
+.article-card p { color: #4b5563; }
+
+/* Daily Inspiration grid */
+.daily-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.daily-grid .card h3 { margin: 0 0 8px; }
+.daily-grid #ayah, .daily-grid #hadith, .daily-grid #dua { font-size: .98rem; color: #374151; }
+
+/* Quran/Hadith section gradient and Arabic font */
+.gradient-soft { background: linear-gradient(180deg, #ffffff, #f3f7ff); }
+.arabic { font-family: 'Amiri', serif; font-size: 1.08rem; line-height: 1.9; direction: rtl; text-align: right; }
+
+/* Apps Coming Soon */
+.apps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; align-items: start; }
+.app-card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: var(--shadow); text-align: center; }
+.app-mockup { font-size: 3rem; }
+.muted { color: #6b7280; }
+
+/* Quick Access Tabs */
+.quick-access { margin: 24px 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.tab { display: inline-block; padding: 10px 14px; border-radius: 999px; background: #fff; color: var(--text); text-decoration: none; box-shadow: var(--shadow); }
+.tab:hover { background: var(--blue-300); }
+
+/* Footer enhancements */
+.site-footer .newsletter { display: grid; gap: 10px; justify-items: center; margin-bottom: 12px; }
+.site-footer .newsletter form { grid-template-columns: 1fr auto; width: 100%; max-width: 520px; }
+.site-footer .newsletter input[type="email"] { width: 100%; }
+.socials { display: flex; gap: 12px; justify-content: center; margin: 10px 0; font-size: 1.2rem; }
+
+/* Header controls */
+.header-controls { display: flex; gap: 8px; align-items: center; }
+
+/* Daily actions and meta */
+.daily-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.daily-meta { margin-top: 6px; color: #6b7280; font-size: .9rem; }
+
+/* Prayer Times */
+#prayerTimes .prayer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-top: 8px; }
+#prayerTimes .prayer-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px; text-align: center; }
+#prayerTimes .prayer-name { font-weight: 700; color: var(--blue-500); }
+#prayerTimes .prayer-time { font-size: 1rem; margin-top: 4px; }
+#prayerTimes .prayer-next { margin-top: 10px; font-weight: 700; }
+#prayerTimes .prayer-actions { margin-top: 10px; display: flex; gap: 8px; }
+
+/* Kids Promo */
+.kids-promo { position: relative; overflow: hidden; text-align: center; }
+.kids-promo-inner { position: relative; z-index: 1; }
+.kids-stars { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: .25; font-size: 3rem; animation: starsFloat 8s ease-in-out infinite; }
+@keyframes starsFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* Floating Mini Player */
+.mini-player { position: fixed; right: 12px; bottom: 12px; display: flex; gap: 8px; align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 999px; box-shadow: var(--shadow); padding: 8px 12px; z-index: 20; }
+.mini-player #miniTrack { font-weight: 600; }
+
+/* WhatsApp floating button */
+.whatsapp-float { position: fixed; right: 12px; bottom: 72px; width: 44px; height: 44px; display: grid; place-items: center; background: #25D366; color: #fff; border-radius: 50%; box-shadow: var(--shadow); text-decoration: none; z-index: 20; }
+.whatsapp-float:hover { filter: brightness(1.05); }
+
+/* Newsletter modal */
+.modal { position: fixed; inset: 0; z-index: 30; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.45); }
+.modal-content { position: relative; margin: 10vh auto; width: 92%; max-width: 520px; background: #fff; border-radius: 16px; box-shadow: var(--shadow); padding: 18px; z-index: 1; }
+.modal-close { position: absolute; right: 10px; top: 10px; border: none; background: #fff; box-shadow: var(--shadow); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; }
+
+/* Footer glow & scroll-to-top */
+.footer-glow { height: 4px; background: linear-gradient(90deg, #5ea0ff, #9bd3ff, #fde68a); border-radius: 999px; margin-bottom: 12px; }
+.scroll-top { position: fixed; right: 12px; bottom: 124px; width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--yellow-500); color: #1f2937; box-shadow: var(--shadow); cursor: pointer; display: none; }
+.scroll-top.show { display: inline-grid; place-items: center; }
+
+/* Small helpers */
+.hidden { display: none !important; }
+
+/* Basic Dark Theme (toggle) */
+body.theme-dark { background: #0f172a; color: #e5e7eb; }
+body.theme-dark .card { background: #111827; color: #e5e7eb; }
+body.theme-dark .nav-link { color: #e5e7eb; }
+body.theme-dark .btn-outline { background: transparent; color: #e5e7eb; border-color: #93c5fd; }
+body.theme-dark .site-header, body.theme-dark .site-footer { background: #0b1220; color: #e5e7eb; }
+body.theme-dark .icon-card { background: #0b1220; color: #e5e7eb; }

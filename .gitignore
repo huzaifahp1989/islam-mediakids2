@@ -1,2 +1,24 @@
 # Local Netlify folder
 .netlify
+
+# Node modules
+node_modules/
+backend/node_modules/
+
+# Environment files
+.env
+.env.local
+backend/.env
+backend/.env.local
+
+# Local databases and uploads
+data/*.db
+backend/data/*.db
+backend/uploads/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/

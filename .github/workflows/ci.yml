@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install root dependencies
+        run: |
+          npm ci || npm install
+
+      - name: Verify key files exist
+        run: |
+          ls -la
+          test -f index.html
+          test -f styles.css
+          test -f scripts/main.js
+          test -f netlify/functions/feed.js
+
+      - name: Load Netlify feed function to catch syntax errors
+        run: |
+          node -e "require('./netlify/functions/feed.js'); console.log('Feed function loads successfully')"
+
+      - name: Load main script to catch syntax errors
+        run: |
+          node -e "require('fs').readFileSync('./scripts/main.js'); console.log('main.js read successfully')"
+

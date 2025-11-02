@@ -46,17 +46,31 @@
         const statusEl = document.getElementById('ttStatus');
         const nextBtn = document.getElementById('ttNext');
         let target = '';
+        let awarded = false;
 
         function pad(n){ return String(n).padStart(2,'0'); }
         function randomTime(){ const h = Math.floor(Math.random()*12)+1; const m = [0,15,30,45][Math.floor(Math.random()*4)]; return `${pad(h)}:${pad(m)}`; }
         function build(){
-          statusEl.textContent=''; optionsEl.innerHTML='';
+          statusEl.textContent=''; optionsEl.innerHTML=''; awarded=false;
           target = randomTime(); clockEl.textContent = target;
           const opts = new Set([target]);
           while(opts.size<4){ opts.add(randomTime()); }
           Array.from(opts).sort(()=>Math.random()-0.5).forEach(t=>{
             const btn=document.createElement('button'); btn.className='btn btn-primary'; btn.textContent=t;
-            btn.addEventListener('click',()=>{ statusEl.textContent = (t===target)?'✅ Correct!':'❌ Try again.'; });
+            btn.addEventListener('click',()=>{
+              const ok = (t===target);
+              statusEl.textContent = ok ? '✅ Correct!' : '❌ Try again.';
+              if (ok && !awarded) {
+                try {
+                  if (typeof currentUser === 'function' && typeof addPoints === 'function') {
+                    const u = currentUser();
+                    if (u) { addPoints(u.id, 1, 'time-teller'); }
+                  }
+                } catch {}
+                alert('Points earned: 1');
+                awarded = true;
+              }
+            });
             optionsEl.appendChild(btn);
           });
         }
@@ -66,4 +80,3 @@
     </script>
   </body>
   </html>
-
