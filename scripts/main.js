@@ -895,6 +895,7 @@ async function initPrayerTimes() {
   const refreshBtn = document.getElementById('prayerRefresh');
   const citySelect = document.getElementById('prayerCity');
   const methodSelect = document.getElementById('prayerMethod');
+  const schoolSelect = document.getElementById('prayerSchool');
   if (!grid || !status) return;
   let timings = null;
   let tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -910,6 +911,8 @@ async function initPrayerTimes() {
   let selectedCity = localStorage.getItem('IMK_PRAYER_CITY') || 'London';
   let loc = CITY_MAP[selectedCity] || CITY_MAP['London'];
   let methodId = parseInt(localStorage.getItem('IMK_PRAYER_METHOD') || '3', 10); // default MWL
+  let schoolId = parseInt(localStorage.getItem('IMK_PRAYER_SCHOOL') || '2', 10); // default Hanafi for UK
+  const latAdj = 3; // AngleBased for high latitudes like UK
   if (citySelect) {
     // initialize select value
     citySelect.value = selectedCity in CITY_MAP ? selectedCity : 'London';
@@ -928,6 +931,14 @@ async function initPrayerTimes() {
       fetchTimings();
     });
   }
+  if (schoolSelect) {
+    schoolSelect.value = String(schoolId);
+    schoolSelect.addEventListener('change', () => {
+      schoolId = parseInt(schoolSelect.value, 10) || 2;
+      localStorage.setItem('IMK_PRAYER_SCHOOL', String(schoolId));
+      fetchTimings();
+    });
+  }
   function renderTimings() {
     if (!timings) return;
     const names = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
@@ -937,7 +948,7 @@ async function initPrayerTimes() {
     }).join('');
     // Do not imply geolocation-based accuracy; we no longer request location permission
     status.textContent = `Prayer times for ${selectedCity} (${tz})`;
-    if (monthlyLink) monthlyLink.href = `https://api.aladhan.com/v1/calendar?latitude=${loc.lat}&longitude=${loc.lon}&method=${methodId}`;
+    if (monthlyLink) monthlyLink.href = `https://api.aladhan.com/v1/calendar?latitude=${loc.lat}&longitude=${loc.lon}&method=${methodId}&school=${schoolId}&latitudeAdjustmentMethod=${latAdj}`;
     updateNextCountdown();
   }
   function parseTimeToDate(t) {
@@ -965,13 +976,28 @@ async function initPrayerTimes() {
   async function fetchTimings() {
     status.textContent = 'Fetching prayer times…';
     try {
-      const url = `https://api.aladhan.com/v1/timings?latitude=${loc.lat}&longitude=${loc.lon}&method=${methodId}`;
-      const res = await fetch(url);
+      const url = `https://api.aladhan.com/v1/timings?latitude=${loc.lat}&longitude=${loc.lon}&method=${methodId}&school=${schoolId}&latitudeAdjustmentMethod=${latAdj}`;
+      const res = await fetch(url, { mode: 'cors' });
       const data = await res.json();
       timings = data && data.data && data.data.timings ? data.data.timings : null;
       tz = (data && data.data && data.data.meta && data.data.meta.timezone) || tz;
       renderTimings(); startCountdown();
-    } catch (e) { console.error('Prayer times error', e); status.textContent = 'Failed to load prayer times'; }
+    } catch (e) {
+      console.error('Prayer times error', e);
+      // Fallback to city-based endpoint if lat/lon fetch fails
+      try {
+        status.textContent = 'Retrying…';
+        const url2 = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(selectedCity)}&country=United%20Kingdom&method=${methodId}&school=${schoolId}&latitudeAdjustmentMethod=${latAdj}`;
+        const res2 = await fetch(url2, { mode: 'cors' });
+        const data2 = await res2.json();
+        timings = data2 && data2.data && data2.data.timings ? data2.data.timings : null;
+        tz = (data2 && data2.data && data2.data.meta && data2.data.meta.timezone) || tz;
+        renderTimings(); startCountdown();
+      } catch (e2) {
+        console.error('Prayer times city fallback error', e2);
+        status.textContent = 'Failed to load prayer times';
+      }
+    }
   }
   // Remove geolocation permission request; always use default location (London) unless overridden elsewhere
   function geolocate(){ fetchTimings(); }
