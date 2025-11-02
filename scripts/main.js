@@ -242,6 +242,7 @@ function bindAuthForm() {
           form.method = 'POST';
           form.target = '_blank';
           const add = (name, value) => { const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = name; inp.value = value || ''; form.appendChild(inp); };
+          // Admin notification
           add('_subject', 'New IMediaC Kids signup');
           add('_captcha', 'false');
           add('_template', 'table');
@@ -251,6 +252,9 @@ function bindAuthForm() {
           add('age', typeof user.age === 'number' ? String(user.age) : '');
           add('signedUpAt', new Date().toLocaleString());
           add('points', String(user.points || 0));
+          // Sender confirmation (FormSubmit auto-response requires an "email" field)
+          add('email', user.email);
+          add('_autoresponse', 'Thank you for signing up to IMediaC Kids! Your child has been registered successfully. If you did not expect this message, please contact support at imediackids.com/contact.');
           document.body.appendChild(form);
           form.submit();
           setTimeout(() => form.remove(), 3000);
