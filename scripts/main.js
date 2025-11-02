@@ -838,7 +838,6 @@ document.addEventListener('DOMContentLoaded', () => {
   bindQuranPage();
   initPrayerTimes();
   bindMiniPlayer();
-  initToggles();
   // Initialize newsletter modal only if present
   if (document.getElementById('newsletterModal')) {
     initNewsletterModal();
@@ -1041,13 +1040,7 @@ function bindMiniPlayer(){
   update();
 }
 
-// Language/Theme toggles
-function initToggles(){
-  const langBtn = document.getElementById('langToggle');
-  const themeBtn = document.getElementById('themeToggle');
-  langBtn && langBtn.addEventListener('click', ()=>{ document.body.classList.toggle('lang-ur'); });
-  themeBtn && themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('theme-dark'); });
-}
+// Language/Theme toggles removed per request
 
 // Newsletter modal
 function initNewsletterModal(){

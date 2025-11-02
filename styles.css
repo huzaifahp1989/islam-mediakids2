@@ -155,7 +155,8 @@ tr:hover td { background: #fafafa; }
   .site-title { font-size: 1.2rem; }
   .menu-toggle { display: inline-block; }
   .header-inner { position: relative; }
-  .nav { position: absolute; top: 100%; left: 0; right: 0; background: #fff; padding: 12px 16px; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; box-shadow: var(--shadow); flex-direction: column; gap: 8px; display: flex; max-height: 0; overflow: hidden; opacity: 0; transform: translateY(-8px); pointer-events: none; transition: max-height .3s ease, opacity .22s ease, transform .3s ease; }
+  /* Make mobile menu push content down instead of overlaying it */
+  .nav { position: static; background: #fff; padding: 12px 16px; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; box-shadow: var(--shadow); flex-direction: column; gap: 8px; display: flex; max-height: 0; overflow: hidden; opacity: 0; transform: translateY(-8px); pointer-events: none; transition: max-height .3s ease, opacity .22s ease, transform .3s ease; }
   .nav-link { padding: 12px 14px; }
   /* Slide-down when toggled */
   .menu-open .nav { max-height: 500px; opacity: 1; transform: translateY(0); pointer-events: auto; }
