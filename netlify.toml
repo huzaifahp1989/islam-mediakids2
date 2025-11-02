@@ -1,6 +1,5 @@
 [build]
   publish = "."
-  main
 
 # Force HTTPS and canonical root domain
 [[redirects]]
