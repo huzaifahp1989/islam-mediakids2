@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Math Quiz – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .mq { display:grid; gap:12px; place-items:center; }
+      .mq-problem { font-size: 1.6rem; font-weight: 700; }
+      .mq-actions { display:flex; gap:8px; align-items:center; }
+      .mq-input { padding:10px 12px; border:2px solid var(--blue-300); border-radius:10px; font-size:1.1rem; width:120px; text-align:center; }
+      .mq-stats { display:flex; gap:12px; font-weight:600; }
+      .mq-status { min-height: 24px; font-weight: 700; }
+      .mq-timer { font-weight:700; color:#0b5ed7; }
+    </style>
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">➗</div><h1 class="site-title">Math Quiz</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link active">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card mq" aria-label="Math quiz">
+        <div class="mq-stats">
+          <span>Score: <strong id="mqScore">0</strong></span>
+          <span>Streak: <strong id="mqStreak">0</strong></span>
+          <span>Time: <strong class="mq-timer" id="mqTime">60</strong>s</span>
+        </div>
+        <div id="mqProblem" class="mq-problem">Ready?</div>
+        <div class="mq-actions">
+          <input id="mqAnswer" class="mq-input" type="number" placeholder="Your answer" />
+          <button id="mqSubmit" class="btn btn-primary">Submit</button>
+          <button id="mqStart" class="btn btn-secondary">Start</button>
+        </div>
+        <div id="mqStatus" class="mq-status"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow</p></div></footer>
+    <script src="scripts/main.js"></script>
+    <script>
+      (function(){
+        const probEl = document.getElementById('mqProblem');
+        const ansEl = document.getElementById('mqAnswer');
+        const submitBtn = document.getElementById('mqSubmit');
+        const startBtn = document.getElementById('mqStart');
+        const statusEl = document.getElementById('mqStatus');
+        const scoreEl = document.getElementById('mqScore');
+        const streakEl = document.getElementById('mqStreak');
+        const timeEl = document.getElementById('mqTime');
+        let a=0,b=0,op='+',answer=0,score=0,streak=0,time=60,timer=null,active=false;
+
+        function rand(n){ return Math.floor(Math.random()*n); }
+        function newProblem(){
+          const ops = ['+','-','×','÷'];
+          op = ops[rand(ops.length)];
+          if (op==='÷') { b = rand(9)+1; answer = rand(10); a = answer*b; }
+          else { a = rand(20)+1; b = rand(20)+1; }
+          switch(op){
+            case '+': answer = a+b; break;
+            case '-': answer = a-b; break;
+            case '×': answer = a*b; break;
+            case '÷': /* already set */ break;
+          }
+          probEl.textContent = `${a} ${op} ${b} = ?`;
+          ansEl.value = '';
+          ansEl.focus();
+        }
+        function start(){ if (active) return; active=true; score=0; streak=0; time=60; updateStats(); newProblem(); statusEl.textContent='Go!'; timer = setInterval(()=>{ time--; timeEl.textContent=time; if(time<=0){ clearInterval(timer); active=false; statusEl.textContent=`Time up! Final score: ${score}`; } },1000); }
+        function updateStats(){ scoreEl.textContent=score; streakEl.textContent=streak; timeEl.textContent=time; }
+        function submit(){ if(!active) return; const val = Number(ansEl.value); if(Number.isNaN(val)) return; if(val===answer){ score+=10; streak++; statusEl.textContent = '✅ Correct! +10'; } else { score=Math.max(0, score-5); streak=0; statusEl.textContent = `❌ Oops! Correct: ${answer}`; }
+          updateStats(); newProblem(); }
+        submitBtn.addEventListener('click', submit);
+        ansEl.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+        startBtn.addEventListener('click', start);
+      })();
+    </script>
+  </body>
+  </html>
+

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spelling Bee – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .sb { display:grid; gap:12px; place-items:center; }
+      .sb-word { display:flex; gap:6px; flex-wrap:wrap; }
+      .sb-letter, .sb-slot { width:40px; height:40px; border-radius:10px; display:grid; place-items:center; font-weight:700; box-shadow: var(--shadow); }
+      .sb-letter { background: #fff; cursor:pointer; }
+      .sb-slot { background: var(--blue-300); }
+      .sb-actions { display:flex; gap:8px; }
+      .sb-status { min-height: 24px; font-weight:700; }
+    </style>
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🐝</div><h1 class="site-title">Spelling Bee</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link active">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <section class="card sb" aria-label="Spelling game">
+        <p>Form the word from shuffled letters.</p>
+        <div id="sbSlots" class="sb-word" aria-label="Empty slots"></div>
+        <div id="sbLetters" class="sb-word" aria-label="Letter bank"></div>
+        <div class="sb-actions">
+          <button id="sbCheck" class="btn btn-primary">Check</button>
+          <button id="sbNext" class="btn btn-secondary">Next</button>
+        </div>
+        <div id="sbStatus" class="sb-status"></div>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow</p></div></footer>
+    <script src="scripts/main.js"></script>
+    <script>
+      (function(){
+        const words = ['ISLAM','QURAN','SUNNAH','MOSQUE','HIJAB','HALAL','IMAN','SADAQAH'];
+        const slotsEl = document.getElementById('sbSlots');
+        const lettersEl = document.getElementById('sbLetters');
+        const statusEl = document.getElementById('sbStatus');
+        const nextBtn = document.getElementById('sbNext');
+        const checkBtn = document.getElementById('sbCheck');
+        let target = '';
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+        function newRound(){ statusEl.textContent=''; lettersEl.innerHTML=''; slotsEl.innerHTML=''; target = words[Math.floor(Math.random()*words.length)];
+          for(let i=0;i<target.length;i++){ const s=document.createElement('div'); s.className='sb-slot'; s.dataset.index=i; s.textContent='_'; slotsEl.appendChild(s); }
+          const bank = shuffle(target.split(''));
+          bank.forEach(ch=>{ const b=document.createElement('div'); b.className='sb-letter'; b.textContent=ch; b.addEventListener('click',()=>placeLetter(ch,b)); lettersEl.appendChild(b); });
+        }
+        function placeLetter(ch, el){ const free = Array.from(slotsEl.children).find(x=>x.textContent==='_'); if(!free) return; free.textContent = ch; el.remove(); }
+        function check(){ const formed = Array.from(slotsEl.children).map(x=>x.textContent).join(''); if(formed===target){ statusEl.textContent='✅ Correct!'; } else { statusEl.textContent=`❌ Try again.`; }
+        }
+        nextBtn.addEventListener('click', newRound); checkBtn.addEventListener('click', check);
+        newRound();
+      })();
+    </script>
+  </body>
+  </html>
+

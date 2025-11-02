@@ -64,6 +64,11 @@ body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; color: var(--text
 .site-footer { margin-top: 40px; padding: 18px 0; text-align: center; background: #fff; box-shadow: var(--shadow); }
 .site-footer p { margin: 0; font-size: .95rem; }
 
+/* Fluid media */
+img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
+/* Override inline iframe heights for responsive embeds */
+.card iframe { width: 100% !important; height: auto !important; aspect-ratio: 16 / 9; }
+
 /* Forms */
 form { display: grid; gap: 12px; }
 input, textarea, select { padding: 10px 12px; border-radius: 10px; border: 2px solid var(--blue-300); font-size: 1rem; }
@@ -135,10 +140,14 @@ tr:hover td { background: #fafafa; }
   .site-title { font-size: 1.2rem; }
   .menu-toggle { display: inline-block; }
   .header-inner { position: relative; }
-  .nav { position: absolute; top: 100%; left: 0; right: 0; background: #fff; padding: 12px 16px; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; box-shadow: var(--shadow); flex-direction: column; gap: 8px; display: none; }
+  .nav { position: absolute; top: 100%; left: 0; right: 0; background: #fff; padding: 12px 16px; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; box-shadow: var(--shadow); flex-direction: column; gap: 8px; display: flex; max-height: 0; overflow: hidden; opacity: 0; transform: translateY(-8px); pointer-events: none; transition: max-height .3s ease, opacity .22s ease, transform .3s ease; }
   .nav-link { padding: 10px 12px; }
-  /* Show menu when toggled */
-  .menu-open .nav { display: flex; }
+  /* Slide-down when toggled */
+  .menu-open .nav { max-height: 500px; opacity: 1; transform: translateY(0); pointer-events: auto; }
+  /* General mobile spacing */
+  .card { padding: 14px; }
+  .grid { gap: 12px; }
+  .hero { padding: 18px; }
 }
 
 /* Mobile card layout for leaderboard (phones) */
@@ -170,3 +179,14 @@ tr:hover td { background: #fafafa; }
 .ayah-item.playing { border-color: var(--yellow-500); box-shadow: 0 0 0 3px rgba(255, 212, 77, .35); }
 .ayah-translation { margin-top: 6px; color: #4b5563; font-size: .98rem; }
 .ayah-list.hide-translation .ayah-translation { display: none; }
+
+/* Small phones adjustments */
+@media (max-width: 520px) {
+  /* Make icon grids single column for easy tapping */
+  .icon-grid { grid-template-columns: 1fr; }
+  /* Full-width controls */
+  input, textarea, select { width: 100%; }
+  .btn { width: 100%; }
+  /* Reduce footer text size a touch */
+  .site-footer p { font-size: .9rem; }
+}

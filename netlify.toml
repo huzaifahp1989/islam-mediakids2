@@ -1,6 +1,6 @@
 [build]
   publish = "."
-
+command = ""
 # Force HTTPS and canonical root domain
 [[redirects]]
   from = "http://imediackids.com/*"

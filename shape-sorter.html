@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shape Sorter – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .ss { display:grid; gap:14px; }
+      .ss-board { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:12px; }
+      .ss-shape, .ss-slot { height:80px; border-radius:14px; display:grid; place-items:center; font-size:1.6rem; box-shadow: var(--shadow); }
+      .ss-shape { background:#fff; cursor:grab; }
+      .ss-slot { border:2px dashed var(--blue-300); background:#f8fbff; }
+      .ss-status { min-height:24px; font-weight:700; }
+    </style>
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🔷</div><h1 class="site-title">Shape Sorter</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link active">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <section class="card ss" aria-label="Shape matching">
+        <p>Drag each shape to its matching outline.</p>
+        <div class="ss-board" id="ssSlots"></div>
+        <div class="ss-board" id="ssShapes"></div>
+        <div id="ssStatus" class="ss-status"></div>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow</p></div></footer>
+    <script src="scripts/main.js"></script>
+    <script>
+      (function(){
+        const shapes = [
+          {key:'circle', label:'⚪'},
+          {key:'square', label:'⬜'},
+          {key:'triangle', label:'🔺'},
+          {key:'star', label:'⭐'},
+          {key:'heart', label:'❤️'},
+          {key:'diamond', label:'🔶'}
+        ];
+        const slots = document.getElementById('ssSlots');
+        const pool = document.getElementById('ssShapes');
+        const statusEl = document.getElementById('ssStatus');
+        let matched = 0;
+
+        function build(){
+          slots.innerHTML=''; pool.innerHTML=''; matched=0; statusEl.textContent='';
+          shapes.forEach(s=>{
+            const slot=document.createElement('div'); slot.className='ss-slot'; slot.dataset.key=s.key; slot.textContent=s.key.toUpperCase();
+            slot.addEventListener('dragover', e=>e.preventDefault());
+            slot.addEventListener('drop', e=>{
+              const k = e.dataTransfer.getData('text/plain');
+              if(k===s.key && !slot.classList.contains('done')) { slot.classList.add('done'); slot.textContent = s.label + ' ' + s.key.toUpperCase(); matched++; checkDone(); }
+            });
+            slots.appendChild(slot);
+          });
+          // shuffle shapes
+          const shuffled = shapes.slice().sort(()=>Math.random()-0.5);
+          shuffled.forEach(s=>{
+            const item=document.createElement('div'); item.className='ss-shape'; item.draggable=true; item.dataset.key=s.key; item.textContent=s.label;
+            item.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', s.key); });
+            pool.appendChild(item);
+          });
+        }
+        function checkDone(){ if(matched===shapes.length){ statusEl.textContent='✅ All matched!'; } }
+        build();
+      })();
+    </script>
+  </body>
+  </html>
+

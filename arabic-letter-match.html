@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Arabic Letter Match – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .alm { display:grid; gap:14px; }
+      .alm-columns { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+      .alm-col { display:grid; gap:8px; }
+      .alm-item { padding:12px; border-radius:12px; background:#fff; box-shadow: var(--shadow); cursor:grab; text-align:center; font-weight:700; }
+      .alm-drop { padding:12px; border-radius:12px; border:2px dashed var(--blue-300); background:#f8fbff; text-align:center; font-weight:700; }
+      .alm-status { min-height:24px; font-weight:700; }
+    </style>
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🔤</div><h1 class="site-title">Arabic Letter Match</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link active">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <section class="card alm" aria-label="Arabic letter matching">
+        <p>Drag the Arabic letters to match their names.</p>
+        <div class="alm-columns">
+          <div id="almLetters" class="alm-col" aria-label="Letters"></div>
+          <div id="almNames" class="alm-col" aria-label="Names"></div>
+        </div>
+        <div id="almStatus" class="alm-status"></div>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow</p></div></footer>
+    <script src="scripts/main.js"></script>
+    <script>
+      (function(){
+        const pairs = [
+          {ch:'ا', name:'Alif'},
+          {ch:'ب', name:'Ba'},
+          {ch:'ت', name:'Ta'},
+          {ch:'ث', name:'Tha'},
+          {ch:'ج', name:'Jim'},
+          {ch:'ح', name:'Ha'}
+        ];
+        const lettersEl = document.getElementById('almLetters');
+        const namesEl = document.getElementById('almNames');
+        const statusEl = document.getElementById('almStatus');
+        let matched = 0;
+
+        function build(){
+          lettersEl.innerHTML=''; namesEl.innerHTML=''; statusEl.textContent=''; matched=0;
+          pairs.slice().sort(()=>Math.random()-0.5).forEach(p=>{
+            const item = document.createElement('div'); item.className='alm-item'; item.textContent=p.ch; item.draggable=true; item.dataset.key=p.name;
+            item.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', p.name); });
+            lettersEl.appendChild(item);
+          });
+          pairs.forEach(p=>{
+            const drop = document.createElement('div'); drop.className='alm-drop'; drop.textContent=p.name; drop.dataset.key=p.name;
+            drop.addEventListener('dragover', e=>e.preventDefault());
+            drop.addEventListener('drop', e=>{
+              const k = e.dataTransfer.getData('text/plain');
+              if(k===p.name && !drop.classList.contains('done')){ drop.classList.add('done'); drop.textContent = p.ch + ' – ' + p.name; matched++; checkDone(); }
+            });
+            namesEl.appendChild(drop);
+          });
+        }
+        function checkDone(){ if(matched===pairs.length){ statusEl.textContent='✅ Great job!'; } }
+        build();
+      })();
+    </script>
+  </body>
+  </html>
+

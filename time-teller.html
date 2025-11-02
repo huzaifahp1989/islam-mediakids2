@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Time Teller – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .tt { display:grid; gap:12px; place-items:center; }
+      .tt-clock { font-size:2rem; font-weight:700; }
+      .tt-options { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+      .tt-status { min-height:24px; font-weight:700; }
+    </style>
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">⏰</div><h1 class="site-title">Time Teller</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link active">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <section class="card tt" aria-label="Tell the time">
+        <p>Select the correct time shown on the clock.</p>
+        <div id="ttClock" class="tt-clock">12:00</div>
+        <div id="ttOptions" class="tt-options"></div>
+        <div id="ttStatus" class="tt-status"></div>
+        <button id="ttNext" class="btn btn-secondary">Next</button>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow</p></div></footer>
+    <script src="scripts/main.js"></script>
+    <script>
+      (function(){
+        const clockEl = document.getElementById('ttClock');
+        const optionsEl = document.getElementById('ttOptions');
+        const statusEl = document.getElementById('ttStatus');
+        const nextBtn = document.getElementById('ttNext');
+        let target = '';
+
+        function pad(n){ return String(n).padStart(2,'0'); }
+        function randomTime(){ const h = Math.floor(Math.random()*12)+1; const m = [0,15,30,45][Math.floor(Math.random()*4)]; return `${pad(h)}:${pad(m)}`; }
+        function build(){
+          statusEl.textContent=''; optionsEl.innerHTML='';
+          target = randomTime(); clockEl.textContent = target;
+          const opts = new Set([target]);
+          while(opts.size<4){ opts.add(randomTime()); }
+          Array.from(opts).sort(()=>Math.random()-0.5).forEach(t=>{
+            const btn=document.createElement('button'); btn.className='btn btn-primary'; btn.textContent=t;
+            btn.addEventListener('click',()=>{ statusEl.textContent = (t===target)?'✅ Correct!':'❌ Try again.'; });
+            optionsEl.appendChild(btn);
+          });
+        }
+        nextBtn.addEventListener('click', build);
+        build();
+      })();
+    </script>
+  </body>
+  </html>
+

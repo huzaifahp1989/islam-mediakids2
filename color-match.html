@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Color Match – IMediaC Kids</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .cm { display:grid; gap:12px; place-items:center; }
+      .cm-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap:10px; }
+      .cm-card { height:70px; border-radius:12px; box-shadow: var(--shadow); cursor:pointer; }
+      .cm-status { min-height:24px; font-weight:700; }
+    </style>
+  </head>
+  <body class="theme-clouds">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-title"><div class="logo-circle">🎨</div><h1 class="site-title">Color Match</h1></div>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">🏠 Home</a>
+          <a href="games.html" class="nav-link active">🎮 Games & 🧠 Quizzes</a>
+          <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+          <a href="stories.html" class="nav-link">📖 Stories</a>
+          <a href="learn.html" class="nav-link">🌙 Learn</a>
+          <a href="prizes.html" class="nav-link">🎁 Prizes</a>
+          <a href="contact.html" class="nav-link">📩 Contact</a>
+          <a href="auth.html" class="nav-link btn btn-outline">Login/Signup</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <section class="card cm" aria-label="Color matching">
+        <div>Find the color: <strong id="cmTarget">Red</strong></div>
+        <div id="cmGrid" class="cm-grid"></div>
+        <div id="cmStatus" class="cm-status"></div>
+        <button id="cmNext" class="btn btn-secondary">Next</button>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="container"><p>© IMediaC Kids – Learn, Play & Grow</p></div></footer>
+    <script src="scripts/main.js"></script>
+    <script>
+      (function(){
+        const colors = [
+          {name:'Red', hex:'#ef4444'},
+          {name:'Blue', hex:'#3b82f6'},
+          {name:'Green', hex:'#22c55e'},
+          {name:'Yellow', hex:'#f59e0b'},
+          {name:'Purple', hex:'#a855f7'},
+          {name:'Pink', hex:'#ec4899'},
+          {name:'Orange', hex:'#fb923c'},
+          {name:'Teal', hex:'#14b8a6'}
+        ];
+        const grid = document.getElementById('cmGrid');
+        const targetEl = document.getElementById('cmTarget');
+        const statusEl = document.getElementById('cmStatus');
+        const nextBtn = document.getElementById('cmNext');
+        let target = null;
+
+        function build(){
+          statusEl.textContent=''; grid.innerHTML='';
+          target = colors[Math.floor(Math.random()*colors.length)];
+          targetEl.textContent = target.name;
+          const set = colors.slice().sort(()=>Math.random()-0.5).slice(0,6);
+          if(!set.find(c=>c.name===target.name)) set[0] = target; // ensure target present
+          set.sort(()=>Math.random()-0.5);
+          set.forEach(c=>{
+            const card = document.createElement('div'); card.className='cm-card'; card.style.background=c.hex; card.title=c.name;
+            card.addEventListener('click', ()=>{
+              if(c.name===target.name){ statusEl.textContent='✅ Correct!'; }
+              else { statusEl.textContent='❌ Try again.'; }
+            });
+            grid.appendChild(card);
+          });
+        }
+        nextBtn.addEventListener('click', build);
+        build();
+      })();
+    </script>
+  </body>
+  </html>
+

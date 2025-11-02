@@ -145,18 +145,32 @@ function bindRadioPlayer() {
   };
 
   toggleBtn.addEventListener('click', async () => {
+    // Guard against play() being aborted by a quick pause() or source change
+    let playPromise;
     try {
       if (audio.paused) {
         updateUi('Buffering…');
-        await audio.play();
+        playPromise = audio.play();
+        await playPromise;
       } else {
         audio.pause();
       }
     } catch (err) {
-      console.error('Radio play error:', err);
-      statusEl.textContent = 'Playback failed';
-      alert('Playback failed. Your browser may require interaction or the stream may be unavailable.');
+      // AbortError is expected when play() is interrupted by pause() — don't treat as a fatal error
+      if (err && err.name === 'AbortError') {
+        console.debug('Radio play aborted (pause or source change).');
+        // Keep UI consistent
+        updateUi('Paused');
+      } else if (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) {
+        // Autoplay restrictions or security policies
+        console.warn('Playback requires user interaction or is blocked:', err);
+        statusEl.textContent = 'Playback requires interaction';
+      } else {
+        console.error('Radio play error:', err);
+        statusEl.textContent = 'Playback failed';
+      }
     } finally {
+      // Only update if no pending play promise or after it settles
       updateUi();
     }
   });
@@ -192,8 +206,15 @@ function bindRadioPlayer() {
   audio.addEventListener('ended', () => updateUi('Stopped'));
   audio.addEventListener('stalled', () => updateUi('Connection stalled'));
   audio.addEventListener('error', (e) => {
-    console.error('Radio error:', audio.error || e);
-    updateUi('Error loading stream');
+    if (audio.error) {
+      console.error('Radio error:', audio.error);
+      updateUi('Error loading stream');
+    } else {
+      // In many browsers, aborting a network request (e.g., pausing quickly after play)
+      // can surface as a generic error without a MediaError. Treat this as a benign abort.
+      console.debug('Radio request aborted or stopped:', e);
+      updateUi('Paused');
+    }
   });
   updateUi('Stopped');
 }
